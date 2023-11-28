@@ -1,0 +1,18 @@
+:root{
+    background-color: #f3f9fb;
+}
+.bac{
+    background-color: #f3f9fb;
+    pointer-events: fill;
+}   
+.sam{
+    color: darkgrey;
+}
+p{
+    margin-top: 0.8rem;
+}
+
+.sample{
+    color: #4e4e4c;
+}
+
