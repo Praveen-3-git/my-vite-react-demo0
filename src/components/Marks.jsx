@@ -1,4 +1,4 @@
-import { Box, Button, Card, CardContent, CardHeader, Container, MenuItem, Snackbar, TextField, Typography } from "@mui/material"
+import { Autocomplete, Box, Button, Card, CardContent, CardHeader, Container, MenuItem, Snackbar, TextField, Typography } from "@mui/material"
 //import { useFormik } from "formik";
 import React,{ useEffect, useState,Fragment} from "react";
 //import * as Yup from 'yup'
@@ -23,9 +23,8 @@ function Marks(){
 
 // eslint-disable-next-line react/prop-types
 function MarkList({handleAdd}){
-  const viewid='COM01R001'
+  const viewid='INF00R001'
   const mararr = JSON.parse(localStorage.getItem("mararr"));
-  
 
   const [tcon,settcon]=useState()
   const [selectedStudent,setselectedStudent]=useState(mararr.find(item => item.id==viewid));
@@ -87,7 +86,7 @@ function MarkList({handleAdd}){
     // }
   ];
   
-  
+
   function load(item){
     console.log(item)
     // const mararr = JSON.parse(localStorage.getItem("mararr"));
@@ -223,15 +222,19 @@ function MarkList({handleAdd}){
 // eslint-disable-next-line react/prop-types
 function MarkEntry({handleBack}){
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const stuarr = JSON.parse(localStorage.getItem("stuarr")) || [];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const subarr =JSON.parse(localStorage.getItem("subarr")) ||[];
     const mararr=JSON.parse(localStorage.getItem("mararr")) ||[];
 
-    const [selectedSname, setSelectedSname] = useState('');
+    const [selectedSname, setSelectedSname] = useState(null);
     const [selectedId, setSelectedId] = useState('');
     const [selectedsub ,setselectedsub]=useState('');
     const [sdep,setsdep]=useState('');
     const [ssem,setssem]=useState('');
+    const [sco,setsco]=useState('');
+    const [semv,setsemv]=useState('');
     const [error, setError] = useState("");
     const [open, setOpen] = useState(false);
     useEffect(() => {
@@ -240,6 +243,7 @@ function MarkEntry({handleBack}){
             setSelectedSname(selectedStudent.sname);
             setsdep(selectedStudent.department);
             setssem(selectedStudent.semester);
+            setsco(selectedStudent.code);
         }
     }, [selectedId, stuarr]);
     useEffect(()=>{
@@ -260,16 +264,19 @@ function MarkEntry({handleBack}){
         setOpen(false);
       };
 
-    function changename(e){
-        setSelectedSname(e.target.value)
+    function changename(value){
+        setSelectedSname(value)
         setSelectedId("")
-        setsdep("")
+        setsdep('')
         setssem('')
+        setsemv('')
+        setsco('')
     }
     function changeroll(e){
         setSelectedId(e.target.value)
         setsdep('')
         setssem("")
+        setsemv('1')
     }
     function handleErInputChange(e, i, j) {
         const inputValue = e.target.value;
@@ -281,16 +288,17 @@ function MarkEntry({handleBack}){
           setError(null);
         }
     }
-  
+    var grade="";
     const semElements = [];
-    for (let i = 1; i <= ssem; i++) {
+    let i=semv
     semElements.push(
-    <div id={`sem${i}`} className="col-sm-6 row" key={`sem${i}`}>
-      <div className="col-sm-9 text-center h5">Semester {i}</div>
+    <div id={`sem${i}`} className="row" key={`sem${i}`}>
+      <div className="col-sm-6 text-center h5">Semester {i}</div>
       <div className="col-sm-3 text-center">Marks</div>
+      <div className="col-sm-3 text-center">Grade</div>
       {[1, 2, 3, 4, 5, 6].map(j => (selectedsub && selectedsub[`sem${i}`][`b${j}`] &&
         (<Fragment key={`s${i}b${j}`}>
-          <div className={`col-sm-9 my-2 s${i}sub${j}`}>
+          <div className={`col-sm-6 my-2 s${i}sub${j}`}>
             <TextField id={`s${i}b${j}`} name={`s${i}b${j}`} size="small"  fullWidth
             value={selectedsub ? selectedsub[`sem${i}`][`b${j}`] : ""} 
             InputProps={{readOnly: true}}/>
@@ -303,16 +311,38 @@ function MarkEntry({handleBack}){
               error={error === `s${j}m${i}`}
               onChange={(e) => {
                 handleErInputChange(e, i, j);
+                const mark = e.target.value;
+                grade = getmark(mark);
+                console.log(grade)
               }}
-              
               helperText={error === `s${j}m${i}` ? (  <span style={{ color: 'red' }}>Need Valid Mark</span>) : (  '')}
             />
+          </div>
+          <div className={`col-sm-3 my-2 s${i}sub${j}`}>
+            <Typography align="center"  marginTop='0.7rem'>
+              {grade}
+            </Typography>
           </div>
         </Fragment>)
       ))}
     </div>
   );
-}
+  function getmark(mark) {
+    if(mark.length>=2){
+      if (mark >= 90) {
+        return 'A';
+      } else if (mark >= 75) {
+        return 'B';
+      } else if (mark >= 60) {
+        return 'C';
+      } else {
+        return 'F';
+      }
+    }
+    
+  }
+  
+  
     
     function val() {
         for (let i = 1; i <= ssem; i++) {
@@ -352,6 +382,7 @@ function MarkEntry({handleBack}){
         sname:selectedSname,
         dep:sdep,
         sem:ssem,
+        code:sco,
       }
       const newmars={}
       for(let i=1;i<=ssem;i++){
@@ -372,7 +403,7 @@ function MarkEntry({handleBack}){
       const newmark={ ...newmark1,...newmars, ...newmark2 }
       return newmark
     }
-    
+
     return (
         <Card>
             <CardHeader title={<Typography variant="h6" component="div">{" "}STUDENT ENTRY{" "}</Typography>} />
@@ -380,7 +411,7 @@ function MarkEntry({handleBack}){
                 <form id="myform" >
                 <div className="row">
                     <div className="col-sm-3 py-3">
-                        <TextField
+                        {/* <TextField
                             select
                             fullWidth
                             id="sname"
@@ -392,7 +423,23 @@ function MarkEntry({handleBack}){
                             {stuarr.map(item => (
                                 <MenuItem value={item.sname} key={item.sname}>{item.sname}</MenuItem>
                             ))}
-                        </TextField>
+                        </TextField> */}
+                        <Autocomplete
+                          disablePortal
+                          fullWidth
+                          options={stuarr.map(item => item.sname)}
+                          onChange={(e, value) => {
+                            console.log(value);
+                            changename(value)
+                          }}
+                          value={selectedSname}
+                          renderInput={(params) => (
+                            <TextField
+                              label="SELECT STUDENT"
+                              {...params}
+                            />
+                          )}
+                        />
                     </div>
                     <div className="col-sm-3 py-3">
                         <TextField
@@ -418,14 +465,14 @@ function MarkEntry({handleBack}){
                         <TextField
                             select
                             fullWidth
-                            id="sdep"
-                            name='sdep'
+                            id="sco"
+                            name='sco'
                             label="DEPARTMENT"
-                            value={sdep}
+                            value={sco}
                             sx={{pointerEvents:"none"}}
                         >
                             {stuarr.map(item => (
-                                <MenuItem value={item.department} key={item.department}>{item.department}</MenuItem>
+                                <MenuItem value={item.code} key={item.code}>{item.code}</MenuItem>
                             ))}
                         </TextField>
                     </div>
@@ -436,17 +483,20 @@ function MarkEntry({handleBack}){
                             id="ssem"
                             name='ssem'
                             label="SEMESTER"
-                            value={ssem}
-                            sx={{pointerEvents:"none"}}
+                            value={semv}
+                            onChange={(e)=>setsemv(e.target.value)}
+                            //sx={{pointerEvents:"none"}}
                         >
-                            {stuarr.map(item => (
-                                <MenuItem value={item.semester} key={item.semester}>{item.semester}</MenuItem>
-                            ))}
+                            {/* {stuarr.map(item => (
+                                <MenuItem value={item.semester } key={item.semester}>{item.semester}</MenuItem>
+                            ))} */}
+                            {ssem? [1,2,3,4].filter(item=> item<=ssem).map(itemm=>(<MenuItem value={itemm} key={itemm}>{itemm}</MenuItem>) )
+                                :[1,2,3,4].map(item=> (<MenuItem value={item} key={item}>{item}</MenuItem>))}
                         </TextField>
                     </div>
                 </div>
                 <div className="row">
-                    {semElements}
+                    {semv!=0 && semElements}
                 </div>
                 </form>
                 <div className="text-end my-2">
@@ -464,3 +514,34 @@ function MarkEntry({handleBack}){
 }
 
 export default Marks
+
+// for (let i = 1; i <= ssem; i++) {
+//   semElements.push(
+//   <div id={`sem${i}`} className="row" key={`sem${i}`}>
+//     <div className="col-sm-9 text-center h5">Semester {i}</div>
+//     <div className="col-sm-3 text-center">Marks</div>
+//     {[1, 2, 3, 4, 5, 6].map(j => (selectedsub && selectedsub[`sem${i}`][`b${j}`] &&
+//       (<Fragment key={`s${i}b${j}`}>
+//         <div className={`col-sm-9 my-2 s${i}sub${j}`}>
+//           <TextField id={`s${i}b${j}`} name={`s${i}b${j}`} size="small"  fullWidth
+//           value={selectedsub ? selectedsub[`sem${i}`][`b${j}`] : ""} 
+//           InputProps={{readOnly: true}}/>
+//         </div>
+//         <div className={`col-sm-3 my-2 s${i}sub${j}`}>
+//           <TextField
+//             id={`s${i}m${j}`}
+//             name={`s${i}m${j}`}
+//             size="small"
+//             error={error === `s${j}m${i}`}
+//             onChange={(e) => {
+//               handleErInputChange(e, i, j);
+//             }}
+            
+//             helperText={error === `s${j}m${i}` ? (  <span style={{ color: 'red' }}>Need Valid Mark</span>) : (  '')}
+//           />
+//         </div>
+//       </Fragment>)
+//     ))}
+//   </div>
+// );
+// }

@@ -60,22 +60,28 @@ function StudentList({ handleAdd, handleEdit }) {
   }, []);
 
   const columns = [
-    {field:"profile",headerName:'PROFILE',align:'center',headerAlign:'center',headerClassName: 'headercol',sortable:false, renderCell:(params)=>(
+    {field:"profile",headerName:'PROFILE',align:'center',headerAlign:'center',headerClassName: 'headercol',sortable:false, flex:0.5,renderCell:(params)=>(
       <div>
         <Avatar  alt={params.row.sname} src={`src/assets/Avatar/avatar${Math.floor(Math.random() * 10)}.jpg`} />
       </div>
     )},
-    { field: "id", headerName: "STUDENT_ROLL",headerClassName: 'headercol',  minwidth:100 ,width:150},
-    { field: "sname", headerName: "STUDENT_NAME",headerClassName: 'headercol',  minwidth:100 ,width:200 },
+    { field: "id", headerName: "STUDENT_ROLL",headerClassName: 'headercol',align:'center',headerAlign:'center',  minwidth:100 ,flex:1},
+    { field: "sname", headerName: "STUDENT_NAME",headerClassName: 'headercol',headerAlign:'center',  minwidth:100 ,flex:2 ,renderCell:(params)=>(
+      <div>
+        <Typography variant="subtitle1">{params.row.sname}</Typography>
+        <Typography variant="body2">{params.row.department}</Typography>
+      </div>
+    )},
     //{ field: "gender", headerName: "GENDER", minwidth:100 ,width:100 },
     //{ field: "date", headerName: "DOB", minwidth:100 },
     //{ field: "email", headerName: "Email_Id" ,headerClassName: 'headercol',  minwidth:100 ,width:200},
-    { field: "department", headerName: "DEPARTMENT" ,headerClassName: 'headercol', minwidth:100 ,width:250  },
-    { field: "semester", headerName: "SEMESTER" ,headerClassName: 'headercol',  minwidth:100 },
+    //{ field: "department", headerName: "DEPARTMENT" ,headerClassName: 'headercol', minwidth:100 ,width:250  },
+    { field: "semester", headerName: "SEMESTER" ,headerClassName: 'headercol', align:'center',headerAlign:'center', minwidth:100,flex:0.5 },
     {
       field: "act",
       headerName: "ACTION",
       minwidth:100 ,
+      flex:1,
       align: "center",
       headerAlign: "center",
       sortable: false ,
@@ -107,7 +113,8 @@ function StudentList({ handleAdd, handleEdit }) {
         title={ <Typography variant="h6" component="div">{" "}STUDENT LIST{" "} </Typography>}
         action={<Button  variant="contained"  id="addbtn"  onClick={handleAdd}  sx={{ marginX: "2rem" }}>  ADD </Button>}
       />
-      <CardContent sx={{  margin:"auto",'& .headercol': {backgroundColor: 'gray',color:"white",},}}>
+      {studata.length>0
+        ?(<CardContent sx={{  margin:"auto",'& .headercol': {backgroundColor: 'gray',color:"white",},}}>
         <DataGrid
           rows={studata}
           columns={columns}
@@ -121,7 +128,8 @@ function StudentList({ handleAdd, handleEdit }) {
           pageSizeOptions={[5, 10, 25]}
           disableRowSelectionOnClick
         />
-      </CardContent>
+      </CardContent>)
+        :(<CardContent><Typography align='center'>NO RECORD FOUND</Typography></CardContent>)}
     </Card>
   );
 }
