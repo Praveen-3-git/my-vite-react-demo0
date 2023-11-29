@@ -6,7 +6,7 @@ import MuiAlert from '@mui/material/Alert';
 import { DataGrid } from "@mui/x-data-grid";
 function Marks(){
 
-  const [add, setAdd] = useState(true);
+  const [add, setAdd] = useState(false);
   function handleAdd() {
     setAdd(false);
   }

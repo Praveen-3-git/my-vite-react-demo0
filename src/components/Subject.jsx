@@ -217,6 +217,7 @@ function SubjectEntry( {handleBack ,erow ,depn}){
   const [open, setOpen] = useState(false);
   const [sdep,setsdep]=useState(erow? depn:"")
   const [rdo,setrdo] =useState('')
+  const [err,seterr]=useState('')
   const empdata = {
     id: "",
     dep: "",
@@ -289,6 +290,8 @@ function SubjectEntry( {handleBack ,erow ,depn}){
           <TextField id={`s${i}b${j}`} name={`s${i}b${j}`} size="small" label={`Subject${j}`} fullWidth required={(i < 3 && j < 7) || (i > 2 && j < 5)}
             value={subdata[`sem${i}`][`b${j}`]}
             InputProps={{readOnly: (rdo>=i?true:false)}}
+            error={err===`s${i}b${j}`}
+            helperText={err === `s${i}b${j}` ? (  <span style={{ color: 'red' }}>No Duplicate Subjects</span>) : (  '')}
             onChange={(e) => {
               const updatedValue = e.target.value;
               setsubdata((prevSelectedDep) => ({
@@ -317,14 +320,47 @@ function SubjectEntry( {handleBack ,erow ,depn}){
             // Check for duplicate in other text fields
             let otherValue = document.getElementById(`s${i}b${j1}`).value;
             if (kk === otherValue) {
-              alert(`Duplicate value found in s${i}b${j1}`);
+              seterr(`s${i}b${j}`)
+              //alert(`Duplicate value found in s${i}b${j}`);
               return false;
             }
           }
         }
       }
     }
+    seterr(null)
     return true
+  }
+  function dup2(ss){
+    let up=subarr.find(item => item.dep==sdep)
+    var c1=0;
+    for(let w=1;w<=6;w++){
+      let kk= document.getElementById(`s${ss}b${w}`).value
+      if (kk !== "") {
+        for(let i=1;i<ss;i++){
+          for (let j1 = 1; j1 <= w; j1++) {
+            if (j1 !== w) {
+              // Check for duplicate in other text fields
+              //let otherValue = document.getElementById(`s${i}b${j1}`).value;
+              let otherValue=up[`sem${i}`][`b${j1}`]
+              if (kk === otherValue) {
+                seterr(`s${ss}b${w}`)
+                //alert(`Duplicate value found in s${i}b${j}`);
+                c1++;
+                //return false;
+              }
+            }
+          }
+        }
+      }
+    }
+    if(c1!=0){
+      return false;
+    }
+    else{
+      seterr(null)
+      return true
+    }
   }
   
   function addSubject() {
@@ -373,47 +409,47 @@ function SubjectEntry( {handleBack ,erow ,depn}){
   
   function savework(e){
     e.preventDefault();
-    
     if(dup(tvalue)){
-      if(subarr.some(item => item.dep == sdep)){
-        updatesub(tvalue)
-      }else{
-        addSubject()
+      if(dup2(tvalue)){
+        if(subarr.some(item => item.dep == sdep)){        
+          updatesub(tvalue)        
+        }else{
+          addSubject()
+        }
+        if(tvalue=="4"){
+          settValue('1')
+          document.getElementById("closeBtn").click();
+        }
+        else{settValue( (parseInt(tvalue)+1).toString() )}
+        console.log("adddd")
       }
-      if(tvalue=="4"){
-        settValue('1')
-        document.getElementById("closeBtn").click();
       }
-      else{settValue( (parseInt(tvalue)+1).toString() )}
-      console.log("adddd")
-    }
-    
-    
   }
 
   function updatesub(ss){
     let upid=subarr.findIndex(item => item.dep==sdep)
-    if(ss){
-      for(let i=1;i<=6;i++){
-        if((ss < 3 && i < 7) || (ss > 2 && i < 5)){
-          subarr[upid][`sem${ss}`][`b${i}`]=(document.getElementById(`s${ss}b${i}`).value !=( "" || "Pending"))? (document.getElementById(`s${ss}b${i}`).value) :"Pending"
-        }else{
-          subarr[upid][`sem${ss}`][`b${i}`]=document.getElementById(`s${ss}b${i}`).value 
-        }
-      }
-    }else{
-      for(let j=1;j<=4;j++){
+      console.log(dup2(ss))
+      if(ss){
         for(let i=1;i<=6;i++){
-          if((j < 3 && i < 7) || (j > 2 && i < 5)){
-            subarr[upid][`sem${j}`][`b${i}`]=(document.getElementById(`s${j}b${i}`).value !=( "" || "Pending"))? (document.getElementById(`s${j}b${i}`).value) :"Pending"
+          if((ss < 3 && i < 7) || (ss > 2 && i < 5)){
+            subarr[upid][`sem${ss}`][`b${i}`]=(document.getElementById(`s${ss}b${i}`).value !=( "" || "Pending"))? (document.getElementById(`s${ss}b${i}`).value) :"Pending"
           }else{
-            subarr[upid][`sem${j}`][`b${i}`]=document.getElementById(`s${j}b${i}`).value 
+            subarr[upid][`sem${ss}`][`b${i}`]=document.getElementById(`s${ss}b${i}`).value 
+          }
+        }
+      }else{
+        for(let j=1;j<=4;j++){
+          for(let i=1;i<=6;i++){
+            if((j < 3 && i < 7) || (j > 2 && i < 5)){
+              subarr[upid][`sem${j}`][`b${i}`]=(document.getElementById(`s${j}b${i}`).value !=( "" || "Pending"))? (document.getElementById(`s${j}b${i}`).value) :"Pending"
+            }else{
+              subarr[upid][`sem${j}`][`b${i}`]=document.getElementById(`s${j}b${i}`).value 
+            }
           }
         }
       }
-    }
-    localStorage.setItem("subarr", JSON.stringify(subarr));
-    console.log(subarr)
+      localStorage.setItem("subarr", JSON.stringify(subarr));
+      console.log(subarr)
   }
 
   function depchange(e){
@@ -427,26 +463,7 @@ function SubjectEntry( {handleBack ,erow ,depn}){
       setsubdata(empdata)
     }
   }
-  // function checkmar(e){
-  //   var fildep=mararr.filter(item=> item.dep==e.target.value)
-  //   console.log(fildep)
-  //   if(fildep.some(item=> item.s4m1)){
-  //     console.log("found 4")
-  //     setrdo('4')
-  //   }  
-  //   else if(fildep.some(item=> item.s3m1)){
-  //     console.log("found 3")
-  //     setrdo('3')
-  //   }
-  //   else if(fildep.some(item=> item.s2m1)){
-  //     console.log("found 2")
-  //     setrdo('2')
-  //   }
-  //   else if(fildep.some(item=> item.s1m1)){
-  //     console.log("found 1")
-  //     setrdo('1')
-  //   }
-  // }
+ 
   return (
     <Container>
       <Card>
