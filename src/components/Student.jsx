@@ -1,4 +1,4 @@
-import { Avatar, Button, ButtonGroup, Card, CardContent, CardHeader, Container, Grid, MenuItem, TextField, Typography,} from "@mui/material";
+import { Avatar, Button, ButtonGroup, Card, CardContent, CardHeader, Container, Fab, Grid, MenuItem, TextField, Tooltip, Typography,} from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useFormik } from "formik";
 import { useEffect, useState } from "react";
@@ -9,6 +9,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { DatePicker } from "@mui/x-date-pickers";
+import AddIcon from '@mui/icons-material/Add';
 
 function Student() {
   const [add, setadd] = useState(true);
@@ -88,13 +89,17 @@ function StudentList({ handleAdd, handleEdit }) {
       headerClassName: 'headercol', 
       renderCell: (params) => (
         <ButtonGroup variant="contained" size="small">
+          <Tooltip title="EDIT" placement="left" arrow> 
           <Button color="info" onClick={() => handleEdit(params.row)}>
             <EditIcon/>
           </Button>
+          </Tooltip>
           {!ch.some((itemm) => itemm == params.row.id) && (
+          <Tooltip title="DELETE" placement='right' arrow >
           <Button color="error" onClick={() => handleDelete(params.row)}>
             <DeleteIcon/>
-          </Button>)}
+          </Button>
+          </Tooltip>  )}
         </ButtonGroup>
         )
     },
@@ -108,10 +113,10 @@ function StudentList({ handleAdd, handleEdit }) {
   };
 
   return (
-    <Card>
-      <CardHeader
-        title={ <Typography variant="h6" component="div">{" "}STUDENT LIST{" "} </Typography>}
-        action={<Button  variant="contained"  id="addbtn"  onClick={handleAdd}  sx={{ marginX: "2rem" }}>  ADD </Button>}
+    <Card style={{ width: "100%" }}>
+      <CardHeader sx={{backgroundColor:"#ece8d9"}}
+        title={"STUDENT LIST"}
+        action={<Tooltip title="ADD" placement='top' arrow><Fab color='primary' size='small'  id="addbtn" onClick={handleAdd} sx={{marginX:'1rem',backgroundColor:"white",color:'black',":hover": {backgroundColor: "lightyellow"}}} > <AddIcon/></Fab></Tooltip>}
       />
       {studata.length>0
         ?(<CardContent sx={{  margin:"auto",'& .headercol': {backgroundColor: 'gray',color:"white",},}}>
@@ -146,7 +151,7 @@ function StudentEntry({ handleBack , erow }) {
   const [depn,setdepn]=useState(erow ? upid.department:"");
   const [rol,setrol]=useState(erow ? upid.id : "");
   const stuarr = JSON.parse(localStorage.getItem("stuarr")) || [];
-  const subarr = JSON.parse(localStorage.getItem("subarr"));
+  const subarr = JSON.parse(localStorage.getItem("subarr"))||[];
   
   const formik = useFormik({
     initialValues: {
@@ -210,22 +215,30 @@ function StudentEntry({ handleBack , erow }) {
     onSubmit: (values) => {
       // Handle form submission
       if(erow){
-        console.log(values);
-
+        updatework(values);
+        console.log(stuarr)
+        localStorage.setItem("stuarr",JSON.stringify(stuarr)); 
       }else{
         stuarr.push(values);
         console.log(stuarr)
         localStorage.setItem("stuarr",JSON.stringify(stuarr)); 
-        ba()
-      }
-      
+      } 
+      ba()
     },
   });
-  // if(erow){
-  //   const event =new Event('change');
-  //   const element =document.getElementById('sname')
-  //   element.dispatchEvent(event)
-  // }
+
+  function updatework(values){
+    // eslint-disable-next-line react/prop-types
+    let upid=stuarr.findIndex(item=> item.id==erow.id)
+    stuarr[upid].sname=values.sname;
+    stuarr[upid].gender=values.gender;
+    stuarr[upid].email=values.email;
+    stuarr[upid].department=values.department;
+    stuarr[upid].semester=values.semester;
+    stuarr[upid].id=values.id;
+    stuarr[upid].date=values.date;
+    stuarr[upid].code=values.code;
+  }
 
   function ba(){
     document.getElementById("closebtn").click();
@@ -274,29 +287,29 @@ function StudentEntry({ handleBack , erow }) {
 
   const depoptio = () => {
     const menuItems = [];
-    subarr.forEach(item => {
-      let a = [];
-      for (let i = 1; i <= 4; i++) {
-        for (let j = 1; j <= 6; j++) {
-          //a.push(item[`s${i}m${j}`]);
-          if((i < 3 && j < 7) || (i > 2 && j < 5))
-            a.push(item[`sem${i}`][`b${j}`])
+      subarr.forEach(item => {
+        let a = [];
+        for (let i = 1; i <= 4; i++) {
+          for (let j = 1; j <= 6; j++) {
+            //a.push(item[`s${i}m${j}`]);
+            if((i < 3 && j < 7) || (i > 2 && j < 5))
+              a.push(item[`sem${i}`][`b${j}`])
+          }
         }
-      }
-      if (!a.some(subject => subject === "")) {
-        menuItems.push(
-          <MenuItem value={item.dep} key={item.dep}>
-            {item.dep}
-          </MenuItem>
-        );
-      }
-    });
-    return menuItems;
+        if (!a.some(subject => subject === "")) {
+          menuItems.push(
+            <MenuItem value={item.dep} key={item.dep}>
+              {item.dep}
+            </MenuItem>
+          );
+        }
+      });
+      return menuItems;
   };
   
   return (
     <Card>
-      <CardHeader title={<Typography variant="h6" component="div">  {" "}  STUDENT ENTRY{" "}</Typography>}/>
+      <CardHeader title={"STUDENT ENTRY"} sx={{backgroundColor:"#ece8d9"}}/>
       <CardContent>
         <form className="myform" onSubmit={formik.handleSubmit}>
           <Grid container spacing={4}>
@@ -461,10 +474,10 @@ function StudentEntry({ handleBack , erow }) {
               helperText={formik.touched.id && formik.errors.id}
             />
             </Grid>
-            <Grid item sm={12} sx={{ textAlign: "right" }}>
-              {erow ? (<Button  variant="contained"  color="info"  sx={{ margin: "1rem" }}  type="submit"> Update </Button>) : 
-              (<Button  variant="contained"  color="success"  sx={{ margin: "1rem" }}  type="submit"> Save </Button>)}
-              <Button  variant="contained"  color="error"  sx={{ margin: "1rem" }}  id="closebtn"  onClick={handleBack}> Cancel</Button>
+            <Grid item sm={12} sx={{ textAlign: "right",marginBottom:'1rem' }}>
+              {erow ? (<Button  variant="contained"  color="info"  sx={{ marginX: "1rem" }}  type="submit"> Update </Button>) : 
+              (<Button  variant="contained"  color="success"  sx={{ marginX: "1rem" }}  type="submit"> Save </Button>)}
+              <Button  variant="contained"  color="error"  sx={{ marginX: "1rem" }}  id="closebtn"  onClick={handleBack}> Cancel</Button>
             </Grid>
           </Grid>
         </form>

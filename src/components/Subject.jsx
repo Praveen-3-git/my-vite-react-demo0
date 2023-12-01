@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
-import { Card, CardHeader, CardContent, Button, Container, TextField, Snackbar, Alert,  Box, Typography, MenuItem, Fab, Tab, IconButton, Tooltip} from '@mui/material';
+import { Card, CardHeader, CardContent, Button, Container, TextField, Box, Typography, MenuItem, Fab, Tab, IconButton, Tooltip} from '@mui/material';
+//import {Snackbar, Alert,} from '@mui/material'
 import { DataGrid } from '@mui/x-data-grid';
 import { useEffect, useState } from 'react';
 import { Fragment } from 'react';
@@ -57,8 +58,8 @@ function SubjectList({handleAdd , handleEdit ,depn ,tableon,handlerEdit,tableonb
   
   const subarr = JSON.parse(localStorage.getItem("subarr"))||[]
   const column1=[
-    {field :'id', headerName:'S.NO',flex:0.2 ,headerClassName: 'headercol',},
-    {field :'name', headerName:'DEPARTMENT', flex:1, headerAlign: 'center',headerClassName: 'headercol',renderCell: (params) => (
+    {field :'id', headerName:'S.NO',flex:0.2 ,headerClassName: 'headercol',minWidth:100},
+    {field :'name', headerName:'DEPARTMENT', flex:1, headerAlign: 'center',headerClassName: 'headercol',minWidth:100,renderCell: (params) => (
             <Tooltip title="Show data" placement="left" arrow> 
               <Button
                 fullWidth
@@ -93,7 +94,7 @@ function SubjectList({handleAdd , handleEdit ,depn ,tableon,handlerEdit,tableonb
   var row1=data.filter((item) => subarr.some((itemm) => itemm.dep === item.name))
 
   const column = [
-    { field: 'sem', headerName: 'Semester',align:'center',headerAlign:'center' , headerClassName: 'headercol',flex:1},
+    { field: 'sem', headerName: 'Semester',align:'center',headerAlign:'center' , headerClassName: 'headercol',flex:1,minWidth:100},
     { 
       field: 'subject',  
       headerName: 'Subject', 
@@ -101,6 +102,7 @@ function SubjectList({handleAdd , handleEdit ,depn ,tableon,handlerEdit,tableonb
       headerAlign:'center' ,
       flex:2,
       sortable: false ,
+      minWidth:150,
       renderCell: (params) => (
         <div>
           {params.value.map((subject, index) => (
@@ -118,6 +120,7 @@ function SubjectList({handleAdd , handleEdit ,depn ,tableon,handlerEdit,tableonb
       headerAlign: 'center',
       headerClassName: 'headercol', 
       sortable: false ,
+      minWidth:100,
       renderCell: (params) => (
           <Tooltip title="Show data" placement="left" arrow> 
             <Button
@@ -168,23 +171,9 @@ function SubjectList({handleAdd , handleEdit ,depn ,tableon,handlerEdit,tableonb
   return(
         <Card style={{width: "100%" }}>
         <CardHeader sx={{backgroundColor:"#ece8d9"}}
-        title={
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-          <Typography variant="h5" style={{ flex: 1 }}> SUBJECT LIST  </Typography>
-          {/* <FormControl style={{ flex: 1 }}>
-            <Select id="seldep" size='small' name="seldep" defaultValue="" onChange={changefun} displayEmpty sx={{backgroundColor:"white"}}>
-            <MenuItem value="" disabled >  Select Department </MenuItem>
-              {data.filter((item) => subarr.some((itemm) => itemm.dep === item.name)).map((item) => (
-                <MenuItem value={item.name} key={item.name}>{item.name}</MenuItem>
-              ))}
-            </Select> 
-          </FormControl> */}
-          <div className="col-sm-3 text-end">
-          <Fab color='primary' size='small'  id="addbtn" onClick={handleAdd} sx={{marginX:'3rem',backgroundColor:"white",color:'black',":hover": {backgroundColor: "lightyellow"}}}  > <AddIcon/></Fab>
-          {depn &&(<IconButton sx={{marginX:"1rem"}} id='closeBtn' onClick={tableonback}><CloseIcon/></IconButton>) }
-        </div>
-        </div>
-        }
+        title={'SUBJECT LIST'}
+        action={<><Fab color='primary' size='small'  id="addbtn" onClick={handleAdd} sx={{marginX:'1rem',backgroundColor:"white",color:'black',":hover": {backgroundColor: "lightyellow"}}}  > <AddIcon/></Fab>
+          {(depn) &&(<IconButton id='closeBtn' onClick={tableonback}><CloseIcon/></IconButton>)} </>}
         />
         {subarr.length>0
           ?(<CardContent>
@@ -194,8 +183,7 @@ function SubjectList({handleAdd , handleEdit ,depn ,tableon,handlerEdit,tableonb
               </Box>):
               (<Box  sx={{ '& .headercol': {backgroundColor: 'gray',color:"white"}}}>
                 <div className='row'>
-                  <Typography fontWeight='bold' className='col-sm-3 text-center my-3'> DEPARTMENT : </Typography>
-                  <Typography fontWeight='bold' className='col-sm-6 my-3'>{depn}</Typography>
+                  <Typography fontWeight='bold' className='px-3 my-3'> DEPARTMENT : {depn} </Typography>
                 </div>
                 
                 <DataGrid rows={tcon || []} columns={column} getRowHeight={() => 'auto'} disableRowSelectionOnClick hideFooter />
@@ -203,7 +191,6 @@ function SubjectList({handleAdd , handleEdit ,depn ,tableon,handlerEdit,tableonb
             }
           </CardContent>)
           :(<CardContent><Typography align='center'>NO RECORD FOUND</Typography></CardContent>)}
-        
       </Card>
   )
 }
@@ -213,8 +200,8 @@ function SubjectEntry( {handleBack ,erow ,depn}){
   const data= JSON.parse(localStorage.getItem("dataarr"))||[]
   const mararr=JSON.parse(localStorage.getItem('mararr')) || [];
   const subarr= JSON.parse(localStorage.getItem("subarr")) || [];
-  const [error, setError] = useState("");
-  const [open, setOpen] = useState(false);
+  //const [error, setError] = useState("");
+  //const [open, setOpen] = useState(false);
   const [sdep,setsdep]=useState(erow? depn:"")
   const [rdo,setrdo] =useState('')
   const [err,seterr]=useState('')
@@ -241,16 +228,16 @@ function SubjectEntry( {handleBack ,erow ,depn}){
   
   const [subdata,setsubdata]=useState(empdata);
 
-  const handleClick = (e) => {
-    setOpen(true);
-    setError(e)
-  };
-  const handleClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setOpen(false);
-  };
+  // const handleClick = (e) => {
+  //   setOpen(true);
+  //   setError(e)
+  // };
+  // const handleClose = (event, reason) => {
+  //   if (reason === 'clickaway') {
+  //     return;
+  //   }
+  //   setOpen(false);
+  // };
 
   useEffect(() => {
     if(erow){
@@ -371,7 +358,7 @@ function SubjectEntry( {handleBack ,erow ,depn}){
     subarr.push(newSubject);
     console.log(subarr);
     localStorage.setItem("subarr", JSON.stringify(subarr));
-    handleClick('New Department Added')
+    //handleClick('New Department Added')
   }
   
   function inpu(maxId) {
@@ -469,15 +456,10 @@ function SubjectEntry( {handleBack ,erow ,depn}){
       <Card>
         <form id='myform' onSubmit={savework}>
         <CardHeader sx={{backgroundColor:"#ece8d9"}}
-        title={
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <Typography variant="h5" style={{ flex: 1 }}> SUBJECT ENTRY  </Typography>
-          
-          <IconButton sx={{marginX:"1rem"}} id='closeBtn' onClick={handleBack}>
-            <CloseIcon/>
-          </IconButton>
-        </div>
-        }
+        title={"SUBJECT ENTRY"}
+        action={<IconButton sx={{marginX:"1rem"}} id='closeBtn' onClick={handleBack}>
+        <CloseIcon/>
+      </IconButton>}
         />
         <CardContent>
           <div className='my-2'>
@@ -486,14 +468,21 @@ function SubjectEntry( {handleBack ,erow ,depn}){
               onChange={(e) => { depchange(e); }}  //onChange={(e)=>setsdep(e.target.value)}
             >
               <MenuItem value="" disabled> Select Department </MenuItem>
-                {erow 
+                {/* {erow 
                   ?(data.map((item) => (
                     <MenuItem value={item.name} key={item.name}> {item.name} </MenuItem>
                   )))
                   :(data.filter((item) => !subarr.some((itemm) => itemm.dep === item.name)).map((item) => (
                     <MenuItem value={item.name} key={item.name}>{item.name}</MenuItem>
-                  )))}
-    
+                  )))} */}
+                {erow 
+                  ? (data.map((item) => (
+                    <MenuItem value={item.name} key={item.name}> {item.name} </MenuItem>
+                  )))
+                  : (data.map(item=> ((subarr.some((itemm)=> itemm.dep==item.name))
+                      ?(<MenuItem value={item.name} key={item.name} disabled>{item.name}</MenuItem>)
+                      :(<MenuItem value={item.name} key={item.name}>{item.name}</MenuItem>)) ))
+                }
             </TextField>
           </div>
           <Box sx={{ width: '100%', typography: 'body1' }}>
@@ -550,11 +539,11 @@ function SubjectEntry( {handleBack ,erow ,depn}){
             {/* <Button variant="contained" color="success" className='m-3' type='submit'>Save</Button>
             <Button variant="contained" color="error" className='m-3' id="closebtn" onClick={handleBack}>Cancel</Button>
           </div> */}
-          <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+          {/* <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
             <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>
               {open && error}
             </Alert>
-          </Snackbar>
+          </Snackbar> */}
         </CardContent>
         </form>
       </Card>

@@ -1,28 +1,36 @@
-import { Autocomplete, Box, Button, Card, CardContent, CardHeader, Container, MenuItem, Snackbar, TextField, Tooltip, Typography } from "@mui/material"
+/* eslint-disable react/prop-types */
+/* eslint-disable no-undef */
+import { Autocomplete, Box, Button, ButtonGroup, Card, CardContent, CardHeader, Container, Fab, MenuItem, Snackbar, TextField, Tooltip, Typography } from "@mui/material"
 //import { useFormik } from "formik";
 import React,{ useEffect, useState,Fragment} from "react";
 //import * as Yup from 'yup'
 import MuiAlert from '@mui/material/Alert';
 import { DataGrid } from "@mui/x-data-grid";
+import AddIcon from '@mui/icons-material/Add';
 function Marks(){
 
   const [add, setAdd] = useState(true);
+  const [erow,seterow]=useState();
   function handleAdd() {
     setAdd(false);
   }
   function handleBack() {
     setAdd(true);
-    //seterow();
+    seterow();
+  }
+  function handleEdit(row){
+    seterow(row)
+    document.getElementById("addbtn").click();
   }
     return(
         <Container sx={{marginY:"3rem"}}>
-            {add ? <MarkList handleAdd={handleAdd}/>:<MarkEntry handleBack={handleBack}/>}
+            {add ? <MarkList handleAdd={handleAdd} handleEdit={handleEdit}/>:<MarkEntry handleBack={handleBack} erow={erow}/>}
         </Container>
     )
 }
 
 // eslint-disable-next-line react/prop-types
-function MarkList({handleAdd}){
+function MarkList({handleAdd , handleEdit}){
 
   const [sellis,setsellis] = useState(true);
   const [viid,setviid]=useState('');
@@ -37,21 +45,20 @@ function MarkList({handleAdd}){
     setsellis(true)
   }
 
-  const mararr = JSON.parse(localStorage.getItem("mararr"));
+  const mararr = JSON.parse(localStorage.getItem("mararr"))||[];
 
   const [tcon,settcon]=useState()
   const [selectedStudent,setselectedStudent]=useState(mararr.find(item => item.id==viid));
   const [to,setto]=useState('')
   const [ocg,setocg]=useState('')
-  console.log(viid)
-  
+  //console.log(viid)
   const column = [
-    { field: 'sem', headerName: 'Semester',align:'center',headerAlign:'center' },
+    { field: 'sem', headerName: 'Semester',align:'center',headerAlign:'center',headerClassName: 'headercol',flex:1, },
     { 
       field: 'subject',  
       headerName: 'Subject',
       headerAlign:'center' ,
-      width:300,
+      minWidth:200,headerClassName: 'headercol',flex:2,
       renderCell: (params) => (
         <>
           {params.value.map((subject, index) => (
@@ -67,7 +74,7 @@ function MarkList({handleAdd}){
       field: 'mark',  
       headerName: 'Marks',
       headerAlign:'center' ,
-      align:'center',
+      align:'center',headerClassName: 'headercol',flex:1,
       renderCell: (params) => (
         <div>
           {params.value.map((subject,index)=>(
@@ -78,34 +85,50 @@ function MarkList({handleAdd}){
         </div>
       )
     },
-    { field: 'tm', headerName: 'Total Marks',align:'center',headerAlign:'center' },
-    { field: 'cgpa', headerName: 'CGPA',align:'center',headerAlign:'center' },
+    { field: 'tm', headerName: 'Total Marks',align:'center',headerAlign:'center' ,headerClassName: 'headercol',flex:1,},
+    { field: 'cgpa', headerName: 'CGPA',align:'center',headerAlign:'center' ,headerClassName: 'headercol',flex:1,},
     
   ];
   
   const col1=[
-    {field:'id', headerName:"STUDENT_ID",align:"center",headerAlign:"center",flex:1,renderCell: (params) => (
-      <Tooltip title="Show data" followCursor> 
-        <Button
-          fullWidth
-          color='info'
-          onClick={() => {openlist(params.row);setviid(params.row.id)}}
-          sx={{ color:'black'}}
-        > {params.row.id}
-        </Button> 
-      </Tooltip>
-  ) },
-    {field:'sname', headerName:"STUDENT_NAME",align:"center",headerAlign:"center",flex:1,renderCell: (params) => (
-      <Tooltip title="Show data" followCursor> 
-        <Button
-          fullWidth
-          color='info'
-          onClick={() => {openlist(params.row);}}
-          sx={{ color:'black'}}
-        > {params.row.sname}
-        </Button> 
-      </Tooltip>
-  ) }
+    {field:'id', headerName:"STUDENT_ID",align:"center",headerAlign:"center",flex:1,headerClassName: 'headercol',
+    // renderCell: (params) => (
+    //   <Tooltip title="Show data" followCursor> 
+    //     <Button
+    //       fullWidth
+    //       color='info'
+    //       onClick={() => {openlist(params.row);setviid(params.row.id)}}
+    //       sx={{ color:'black'}}
+    //     > {params.row.id}
+    //     </Button> 
+    //   </Tooltip>) 
+      },
+    {field:'sname', headerName:"STUDENT_NAME",align:"center",headerAlign:"center",flex:1,headerClassName: 'headercol',
+    // renderCell: (params) => (
+    //   <Tooltip title="Show data" followCursor> 
+    //     <Button
+    //       fullWidth
+    //       color='info'
+    //       onClick={() => {openlist(params.row);}}
+    //       sx={{ color:'black'}}
+    //     > {params.row.sname}
+    //     </Button> 
+    //   </Tooltip>) 
+},{field:'act', headerName:"ACTION",align:"center",headerAlign:"center",flex:1,headerClassName: 'headercol',renderCell: (params) => (
+  <ButtonGroup variant='contained' size='small'>
+  <Tooltip title="EDIT" placement="left" arrow> 
+    <Button
+      color='primary' onClick={() =>{openlist(params.row);setviid(params.row.id)} } sx={{ paddingY: '0.5rem' }}
+    > View
+    </Button> 
+  </Tooltip>
+  <Tooltip title="DELETE" placement='right' arrow >
+    <Button color='secondary' onClick={()=> handleEdit(params.row)}  >
+      Edit 
+    </Button>
+  </Tooltip>
+</ButtonGroup>
+) }
   ]
 
   function load(item){
@@ -204,11 +227,12 @@ function MarkList({handleAdd}){
 }
 
 function che(){
-  var chh=mararr.find(item => item.id=viid);
+  var chh=mararr.find(item => item.id==viid);
   return hasEmptyValues(chh)
 }
 function hasEmptyValues(obj) {
   for (const key in obj) {
+    // eslint-disable-next-line no-prototype-builtins
     if (obj.hasOwnProperty(key) && (obj[key] === "" || obj[key] === null || obj[key] === undefined)) {
       return true; // Found an empty value
     }
@@ -217,16 +241,16 @@ function hasEmptyValues(obj) {
 }
   return(
     <Card style={{width:"100%"}}>
-      <CardHeader
+      <CardHeader sx={{backgroundColor:"#ece8d9"}}
         title="MARKLIST"
-        action={<Button variant="contained" color="primary" id="addbtn" onClick={handleAdd}> ADD </Button>}
+        action={<Tooltip title="ADD" placement='top' arrow><Fab color='primary' size='small'  id="addbtn" onClick={handleAdd} sx={{marginX:'1rem',backgroundColor:"white",color:'black',":hover": {backgroundColor: "lightyellow"}}} > <AddIcon/></Fab></Tooltip>}
       ></CardHeader>
       {sellis 
-        ? (<CardContent>
-            <Box width='auto' minWidth='70vw' marginX='auto'><DataGrid rows={mararr} columns={col1} /></Box>
-        </CardContent>) 
+        ? ( mararr.length >0 
+          ? (<CardContent><Box width='auto' minWidth='70vw' sx={{ '& .headercol': {backgroundColor: 'gray',color:"white"}}} marginX='auto'><DataGrid rows={mararr} columns={col1} /></Box></CardContent>) 
+          : (<CardContent><Typography align='center'>NO RECORD FOUND</Typography></CardContent>) ) 
         : ( che() 
-            ? (<CardContent>NO VALUE</CardContent>) 
+            ? (<CardContent>Need to Enter mark till Current Semester</CardContent>) 
             : (<CardContent>
               <div className="row gap-2">
                 <div className="row">
@@ -241,7 +265,7 @@ function hasEmptyValues(obj) {
                   <Typography fontWeight='bold' className="col-sm-2">DEPARTMENT: </Typography>
                   <Typography fontWeight='bold' className="col-sm-4" fontFamily='Verdana'> {selectedStudent.dep} </Typography>
                 </div> 
-              <Box width='auto' minWidth='70vw' marginX='auto'><DataGrid rows={tcon || []} columns={column} getRowHeight={() => 'auto'} hideFooter /></Box>
+              <Box width='auto' minWidth='70vw' marginX='auto' sx={{ '& .headercol': {backgroundColor: 'gray',color:"white"}}}><DataGrid rows={tcon || []} columns={column} getRowHeight={() => 'auto'} hideFooter hideScrollbar/></Box>
               
               <div className="row">
                 <span className="col-sm-9"></span>
@@ -249,6 +273,7 @@ function hasEmptyValues(obj) {
                 <span className="col-sm-9"></span>
                 <Typography fontWeight='bold' className="col-sm-2 ">Overall CGPA</Typography><Typography  fontWeight='bold' className="col-sm-1 ">{ocg}</Typography>
               </div>
+                <Button onClick={closelist} >Close</Button>
               </div>
             </CardContent>)) }
     </Card>
@@ -257,7 +282,7 @@ function hasEmptyValues(obj) {
 
 
 // eslint-disable-next-line react/prop-types
-function MarkEntry({handleBack}){
+function MarkEntry({handleBack,erow}){
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const stuarr = JSON.parse(localStorage.getItem("stuarr")) || [];
@@ -266,7 +291,8 @@ function MarkEntry({handleBack}){
     const mararr=JSON.parse(localStorage.getItem("mararr")) ||[];
 
     const [selectedSname, setSelectedSname] = useState(null);
-    const [selectedId, setSelectedId] = useState('');
+    // eslint-disable-next-line react/prop-types
+    const [selectedId, setSelectedId] = useState(erow? erow.id: '');
     const [selectedsub ,setselectedsub]=useState('');
     const [sdep,setsdep]=useState('');
     const [ssem,setssem]=useState('');
@@ -282,14 +308,26 @@ function MarkEntry({handleBack}){
       sem:"",
       sname:"",
     }
-    for(let i=1;i<=4;i++){
-      for(let j=1;j<=6;j++){
-        empdat[`s${i}b${j}`]="";
-        empdat[`s${i}m${j}`]="";
-      }
+    for(let j=1;j<=6;j++){
+      empdat[`s1b${j}`]="";
+      empdat[`s1m${j}`]="";
     }
-    
     const [dismar,setdismar]=useState(empdat);
+    useEffect(()=>{
+      if(erow){
+        const ma=mararr.find(item => item.id==erow.id)
+        const sma=subarr.find(item=> item.dep==ma.dep)
+        console.log(sma)
+        setselectedsub(sma)
+        setSelectedId(ma.id)
+        setSelectedSname(ma.sname);
+        setsdep(ma.dep)
+        setssem(ma.sem)
+        setsco(ma.code)
+        setsemv('1')
+        setdismar(ma)
+      }
+    },[])
     
     useEffect(() => {
         const selectedStudent = stuarr.find(item => item.id === selectedId);
@@ -303,7 +341,6 @@ function MarkEntry({handleBack}){
     useEffect(()=>{
         const ssub=subarr.find(item=> item.dep==sdep)
         setselectedsub(ssub)
-        
     },[sdep, subarr])
     const Alert =React.forwardRef(function Alert(props, ref) {
         return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -328,14 +365,14 @@ function MarkEntry({handleBack}){
         setsco('')
         setselectedsub('')
     }
+    
     function changeroll(e){
         setSelectedId(e.target.value)
         setsdep('')
         setssem("")
         setsemv('1')
-          const upid=mararr.find(item=> item.id==e.target.value)
-          upid?  setdismar(upid) :setdismar(empdat)
-            
+          var up=mararr.find(item=> item.id==e.target.value)
+          up?  setdismar(up) :setdismar(empdat)    
     }
     function handleErInputChange(e, i, j) {
         const inputValue = e.target.value;
@@ -346,9 +383,11 @@ function MarkEntry({handleBack}){
         } else {
           setError(null);
         }
+    } 
+    var ma1={};
+    if(erow){
+      ma1=mararr.find(item => item.id==erow.id)
     }
-    
-    
     const semElements = [];
     let i=semv
     semElements.push(
@@ -374,12 +413,12 @@ function MarkEntry({handleBack}){
                 const updatedValue = e.target.value;
                 setdismar((prevData) => ({...prevData,[`s${i}m${j}`]: updatedValue}))
                 handleErInputChange(e, i, j);
+                console.log(dismar)
                 //reflemark(e.target.value,i,j);
               }}
-              InputProps={{readOnly:dismar[`s${i}m${j}`] > 35? true:false}}
+              InputProps={{readOnly:erow && ma1[`s${i}m${j}`] > 35? true:false}}
               helperText={error === `s${j}m${i}` ? (  <span style={{ color: 'red' }}>Need Valid Mark</span>) : ('')}
             />
-            
           </div>
           <div className={`col-sm-3 my-2 s${i}sub${j}`}>
             <TextField size="small"  id={`s${i}g${j}`} name={`s${i}g${j}`} value={dismar ? getmark(dismar[`s${i}m${j}`]) :""} 
@@ -430,7 +469,7 @@ function MarkEntry({handleBack}){
       return true; // If all checks pass
     }
     function regex(mv) {
-        let rege = /^[0-9]?[0-9]{2}$|^100$/gm;
+        let rege = /^(0{2}|100|[0-9][0-9])$/gm;
         return rege.test(mv);
     }
     const saveon = (e) => {
@@ -481,7 +520,7 @@ function MarkEntry({handleBack}){
           newmars[`s${i}b${j}`] = document.getElementById(`s${i}b${j}`).value;
         }
       }
-      for(let i=2;i<=4;i++){
+      for(let i=2;i<=ssem;i++){
         for(let j=1;j<=6;j++){
           if(selectedsub && selectedsub[`sem${i}`][`b${j}`]){
             newmars[`s${i}b${j}`] = "";
@@ -509,7 +548,7 @@ function MarkEntry({handleBack}){
 
     return (
         <Card>
-            <CardHeader title={<Typography variant="h6" component="div">{" "}STUDENT ENTRY{" "}</Typography>} />
+            <CardHeader title={'STUDENT ENTRY'} sx={{backgroundColor:"#ece8d9"}}/> 
             <CardContent>
                 <form id="myform" onSubmit={saveon}>
                 <div className="row">

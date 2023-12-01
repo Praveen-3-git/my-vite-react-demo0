@@ -146,7 +146,7 @@ const columns = [
     <Card style={{ width: "100%" }}>
       <CardHeader sx={{backgroundColor:"#ece8d9"}}
         title={"DEPARTMENT LIST"}
-        action={<Tooltip title="ADD" placement='top' arrow><Fab color='primary' size='small'  id="addbtn" onClick={handleAdd} sx={{marginX:'3rem',backgroundColor:"white",color:'black',":hover": {backgroundColor: "lightyellow"}}} > <AddIcon/></Fab></Tooltip>}
+        action={<Tooltip title="ADD" placement='top' arrow><Fab color='primary' size='small'  id="addbtn" onClick={handleAdd} sx={{marginX:'1rem',backgroundColor:"white",color:'black',":hover": {backgroundColor: "lightyellow"}}} > <AddIcon/></Fab></Tooltip>}
       ></CardHeader>
       {departmentData.length>0
         ?(<CardContent>
@@ -290,7 +290,7 @@ function DepartmentEntry({ handleBack, erow ,open ,error ,handleClick ,handleClo
   }
   return (
     <Card>
-      <CardHeader title="DEPARTMENT ENTRY" sx={{backgroundColor:"#ece8d9"}}/>
+      <CardHeader title="DEPARTMENT ENTRY" sx={{backgroundColor:"#ece8d9"}} />
       <form id="myform">
         <CardContent>
           <div className='row gap-4 my-4'>
