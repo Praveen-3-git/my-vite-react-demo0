@@ -99,7 +99,7 @@ function StudentList({ handleAdd, handleEdit }) {
           <Button color="error" onClick={() => handleDelete(params.row)}>
             <DeleteIcon/>
           </Button>
-          </Tooltip>  )}
+          </Tooltip>)}
         </ButtonGroup>
         )
     },
@@ -238,6 +238,13 @@ function StudentEntry({ handleBack , erow }) {
     stuarr[upid].id=values.id;
     stuarr[upid].date=values.date;
     stuarr[upid].code=values.code;
+    // eslint-disable-next-line react/prop-types
+    if(ch){
+      // eslint-disable-next-line react/prop-types
+      let ui=mararr.findIndex(ite=> ite.id==erow.id)
+      mararr[ui][`sem`]=values.semester;
+      localStorage.setItem("mararr",JSON.stringify(mararr)); 
+    }
   }
 
   function ba(){

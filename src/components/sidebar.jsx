@@ -25,6 +25,7 @@ import Land from './land.jsx';
 import Subject from './Subject.jsx';
 import Student from './Student.jsx'; 
 import Marks from './Marks.jsx'
+import Report from './Report.jsx'
 import { Button } from '@mui/material';
 const drawerWidth = 240;
 
@@ -97,6 +98,7 @@ const navcontent=[
   { text: 'Subject', icon: <MenuBookIcon /> },
   { text: 'Student', icon: <PersonIcon /> },
   { text: 'Marks', icon: <GradingIcon /> },
+  { text: 'Report', icon: <GradingIcon />}
 ]
 export default function MiniDrawer() {
   const theme = useTheme();
@@ -115,6 +117,8 @@ export default function MiniDrawer() {
       setcontent(<Land/>);
     else if(text=='Marks')
       setcontent(<Marks/>);
+    else if(text=='Report')
+      setcontent(<Report/>);
   }
 
   const handleDrawerOpen = () => {
