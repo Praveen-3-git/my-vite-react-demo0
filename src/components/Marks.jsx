@@ -358,7 +358,7 @@ function MarkEntry({handleBack,erow,pse}){
 
     return (
         <Card>
-            <CardHeader title={'STUDENT ENTRY'} sx={{backgroundColor:"#ece8d9"}}/> 
+            <CardHeader title={'MARK ENTRY'} sx={{backgroundColor:"#ece8d9"}}/> 
             <CardContent>
                 <form id="myform" onSubmit={saveon}>
                 <div className="row">
