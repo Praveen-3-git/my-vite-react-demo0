@@ -19,13 +19,15 @@ import ListItemText from '@mui/material/ListItemText';
 import PersonIcon from '@mui/icons-material/Person';
 import SchoolIcon from '@mui/icons-material/School';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
-import GradingIcon from '@mui/icons-material/Grading';
+//import GradingIcon from '@mui/icons-material/Grading';
 import Department from './Department.jsx';
 import Land from './land.jsx';
 import Subject from './Subject.jsx';
 import Student from './Student.jsx'; 
 import Marks from './Marks.jsx'
 import Report from './Report.jsx'
+import EditNoteIcon from '@mui/icons-material/EditNote';
+import DescriptionIcon from '@mui/icons-material/Description';
 import { Button } from '@mui/material';
 const drawerWidth = 240;
 
@@ -97,8 +99,8 @@ const navcontent=[
   { text: 'Department', icon: <SchoolIcon /> },
   { text: 'Subject', icon: <MenuBookIcon /> },
   { text: 'Student', icon: <PersonIcon /> },
-  { text: 'Marks', icon: <GradingIcon /> },
-  { text: 'Report', icon: <GradingIcon />}
+  { text: 'Marks', icon: <EditNoteIcon /> },
+  { text: 'Report', icon: <DescriptionIcon />}
 ]
 export default function MiniDrawer() {
   const theme = useTheme();
@@ -153,8 +155,8 @@ export default function MiniDrawer() {
         </Toolbar>
       </AppBar>
       <Drawer variant="permanent" open={open} >
-        <DrawerHeader  sx={{backgroundColor:"blanchedalmond"}} onClick={()=>handleclick('Land')} >
-          <Button sx={{marginX:'20%',fontSize:'1.2rem', color:'#494949'}} size='large' >HOME</Button>
+        <DrawerHeader  sx={{backgroundColor:"blanchedalmond"}}  >
+          <Button sx={{marginX:'20%',fontSize:'1.2rem', color:'#494949'}} size='large' onClick={()=>handleclick('Land')} >HOME</Button>
           <IconButton onClick={handleDrawerClose}>
             {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
           </IconButton>

@@ -227,7 +227,7 @@ function MarkEntry({handleBack,erow,pse}){
           </div>
           <div className={`col-sm-3 my-2 s${i}sub${j}`}>
             <TextField size="small"  id={`s${i}g${j}`} name={`s${i}g${j}`} value={dismar ? getmark(dismar[`s${i}m${j}`]) :""} 
-              InputProps={{inputProps: { style: { textAlign: "center" ,color: dismar && getmark(dismar[`s${i}m${j}`]) === 'F' ? 'red' : 'inherit' } }}} 
+              InputProps={{inputProps: { style: { textAlign: "center" ,color: dismar && getmark(dismar[`s${i}m${j}`]) === 'F' ? 'red' : 'green' } }}} 
             />
           </div>
         </Fragment>)
@@ -362,7 +362,7 @@ function MarkEntry({handleBack,erow,pse}){
             <CardContent>
                 <form id="myform" onSubmit={saveon}>
                 <div className="row">
-                    <div className="col-sm-3 py-3">
+                    <div className="col-sm-4 py-3">
                         {/* <TextField
                             select
                             fullWidth
@@ -378,7 +378,7 @@ function MarkEntry({handleBack,erow,pse}){
                         </TextField> */}
                         <Autocomplete
                           disablePortal
-                          fullWidth
+                          fullWidth size="small"
                           options={stuarr.map(item => item.sname)}
                           onChange={(e, value) => {
                             console.log(value);
@@ -396,7 +396,7 @@ function MarkEntry({handleBack,erow,pse}){
                     <div className="col-sm-3 py-3">
                         <TextField
                             select
-                            fullWidth
+                            fullWidth size="small"
                             id="sroll"
                             name='sroll'
                             label="Select Student_ID"
@@ -417,7 +417,7 @@ function MarkEntry({handleBack,erow,pse}){
                     <div className="col-sm-3 py-3">
                         <TextField
                             select
-                            fullWidth
+                            fullWidth size="small"
                             id="sco"
                             name='sco'
                             label="DEPARTMENT"
@@ -430,16 +430,16 @@ function MarkEntry({handleBack,erow,pse}){
                             ))}
                         </TextField>
                     </div>
-                    <div className="col-sm-3 py-3">
+                    <div className="col-sm-2 py-3">
                         <TextField
                             select
-                            fullWidth
+                            fullWidth size="small"
                             id="ssem"
                             name='ssem'
                             label="SEMESTER"
                             value={semv}
                             InputProps={{readOnly:selectedId?false:true}}
-                            sx={!selectedId ? { pointerEvents: "none" } : {}}
+                            sx={!selectedId || (!mararr.some(item => item.id==selectedId)) ? { pointerEvents: "none" } : {}}
                             onChange={(e)=>setsemv(e.target.value)}
                         >
                             {/* {stuarr.map(item => (

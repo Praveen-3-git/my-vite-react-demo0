@@ -1,13 +1,23 @@
+/* eslint-disable react/prop-types */
+/* eslint-disable no-undef */
 import { Box, Button, Card, CardContent, CardHeader, Container, Fab, IconButton, MenuItem, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import { useState, useEffect, Fragment } from "react";
+import { useState, useEffect, Fragment, useRef} from "react";
 import CloseIcon from '@mui/icons-material/Close';
 import AddIcon from '@mui/icons-material/Add';
+import DescriptionIcon from '@mui/icons-material/Description';
+import {useReactToPrint} from "react-to-print";
+import generatePDF from 'react-to-pdf';
+
 
 function Report (){
+  const mararr = JSON.parse(localStorage.getItem("mararr"))||[];
+  
   const [add, setAdd] = useState(true);
   const [selsem,setselsem]=useState('1')
-
+  const [selectedSname, setSelectedSname] = useState('');
+  const [selectedId, setSelectedId] = useState('');
+  const [selectedStudent,setselectedStudent]=useState([])
   function handleAdd() {
     setAdd(false);
   }
@@ -19,19 +29,6 @@ function Report (){
     setselsem(item.toString())
     setAdd(false);
   }
-  return(
-  <Container sx={{marginY:"3rem"}}>
-    {add? <ReportList handleAdd={handleAdd} selectsem={selectsem}/>:<ReportCard handleBack={handleBack} selsem={selsem}/>}
-  </Container>
-  )
-}
-
-// eslint-disable-next-line react/prop-types
-function ReportList({handleAdd,selectsem}){
-  const mararr = JSON.parse(localStorage.getItem("mararr"))||[];
-  const [selectedSname, setSelectedSname] = useState('');
-  const [selectedId, setSelectedId] = useState('');
-  const [selectedStudent,setselectedStudent]=useState([])
   function changename(e){
     setSelectedSname(e.target.value)
     setSelectedId('')
@@ -43,6 +40,20 @@ function ReportList({handleAdd,selectsem}){
     setselectedStudent(ss)
     setSelectedSname(ss.sname);
   }
+  return(
+  <Container sx={{marginY:"3rem"}}>
+    {add
+      ? <ReportList handleAdd={handleAdd} selectsem={selectsem} selectedSname={selectedSname} selectedId={selectedId} selectedStudent={selectedStudent} changename={changename} changeroll={changeroll}/>
+      :<ReportCard handleBack={handleBack} selsem={selsem} selectedId={selectedId}/>}
+  </Container>
+  )
+}
+
+// eslint-disable-next-line react/prop-types
+function ReportList({handleAdd,selectsem,selectedSname,selectedId,selectedStudent,changename,changeroll}){
+  const mararr = JSON.parse(localStorage.getItem("mararr"))||[];
+  
+  
   return(
     <Card style={{width:"100%"}}>
       <CardHeader sx={{backgroundColor:"#ece8d9"}}
@@ -75,7 +86,7 @@ function ReportList({handleAdd,selectsem}){
           {[1,2,3,4].filter(i=> i<=selectedStudent.sem).map(item => (
             <div className="col-sm-3" key={item} id={item} name={item} onClick={() => selectsem(item)} style={{ width: '180px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-around' }}>
               <Button>
-              <img src="src/assets/reportpic.png" alt={`rep${item}`} width="200" height="200" style={{ marginBottom: '10px' }}></img>              
+              <img src="src/assets/reportpic.png" alt={`rep${item}`} width="200" height="200" ></img>              
               </Button>
               <div style={{textAlign:'center',pointerEvents:'none'}}>{`SEMESTER ${item}`}</div> 
             </div>
@@ -83,7 +94,7 @@ function ReportList({handleAdd,selectsem}){
         </div>
         {selectedStudent.sem==4 && (
           <div className="row mt-4" >
-          <Button sx={{color:'black'}}>OverAll Report Card</Button>
+          <Button sx={{color:'black'}} startIcon={<DescriptionIcon/>} onClick={() => selectsem(5)}>OverAll Report Card</Button>
         </div>  
         )}
       </CardContent>
@@ -91,32 +102,28 @@ function ReportList({handleAdd,selectsem}){
   )
 }
 
-
-
-
-
-
-
-
-
 // eslint-disable-next-line react/prop-types
-function ReportCard({handleBack,selsem}){
+function ReportCard({handleBack,selsem,selectedId}){
   const mararr = JSON.parse(localStorage.getItem("mararr"))||[];
   const stuarr = JSON.parse(localStorage.getItem("stuarr"))||[];
     const [tcon,settcon]=useState()
-    const [selectedStudent,setselectedStudent]=useState(mararr.find(item => item.id=='INF00R001'));
-    const [sdat,setsdat]=useState(stuarr.find(item => item.id=='INF00R001'))
+    const [selectedStudent,setselectedStudent]=useState(mararr.find(item => item.id==selectedId));
+    const [sdat,setsdat]=useState(stuarr.find(item => item.id==selectedId))
     const [to,setto]=useState('')
     const [ocg,setocg]=useState('')
     const [arc,setarc]=useState(0)
     
     useEffect(() =>{
-        const ss=mararr.find(item => item.id=='INF00R001')
+        const ss=mararr.find(item => item.id==selectedId)
         setselectedStudent(ss)
-        const dd=stuarr.find(item => item.id=='INF00R001')
+        const dd=stuarr.find(item => item.id==selectedId)
         setsdat(dd)
         setarc(0)
-        arccheck(ss.sem)
+        if(selsem<=4)
+          arcchecks(selsem)
+        else if(selsem==5)
+          arcchecka(ss.sem)
+        
         if(mararr.length>0)
             settcon(load(ss))
     },[])
@@ -228,7 +235,6 @@ function ReportCard({handleBack,selsem}){
           let cgv = ocga.reduce((acc, cur) => acc + cur, inn);
           console.log((cgv / ocga.length).toFixed(2));
           setocg((cgv / ocga.length).toFixed(2))
-      
           return nrf;
       }
       
@@ -253,21 +259,28 @@ function ReportCard({handleBack,selsem}){
         return (cgpa/(cpgarr.length*10)).toFixed(2);
     }
     
-    function che(){
-      var chh=mararr.find(item => item.id=='INF00R001');
-      return hasEmptyValues(chh)
-    }
-    function hasEmptyValues(obj) {
-      for (const key in obj) {
-        // eslint-disable-next-line no-prototype-builtins
-        if (obj.hasOwnProperty(key) && (obj[key] === "" || obj[key] === null || obj[key] === undefined)) {
-          return true; // Found an empty value
+    // function che(){
+    //   var chh=mararr.find(item => item.id=='COM00R001');
+    //   return hasEmptyValues(chh)
+    // }
+    // function hasEmptyValues(obj) {
+    //   for (const key in obj) {
+    //     // eslint-disable-next-line no-prototype-builtins
+    //     if (obj.hasOwnProperty(key) && (obj[key] === "" || obj[key] === null || obj[key] === undefined)) {
+    //       return true; // Found an empty value
+    //     }
+    //   }
+    //   return false; // No empty values found
+    // }
+    function arcchecks(a){
+      for(let j=0;j<=6;j++){
+        if(selectedStudent[`s${a}m${j}`]){
+          selectedStudent[`s${a}m${j}`]<35 && setarc(c=>c+1)
         }
       }
-      return false; // No empty values found
     }
-    function arccheck(a){
-      for(let i=0;i<=a;i++){
+    function arcchecka(a){
+      for(let i=1;i<=a;i++){
         for(let j=0;j<=6;j++){
           if(selectedStudent[`s${i}m${j}`]){
             selectedStudent[`s${i}m${j}`]<35 && setarc(c=>c+1)
@@ -275,9 +288,21 @@ function ReportCard({handleBack,selsem}){
         }
       }
     }
+    const targetRef = useRef();
+    const handlePrint = useReactToPrint({
+      content: () => targetRef.current,
+      fileName: 'your-desired-filename.pdf'
+    });
 
-    
-   return(
+    // const col1=[
+    //   { field: 'sem', headerName: 'Semester',align:'center',headerAlign:'center',headerClassName: 'headercol',flex:1, },
+    //   { field: 'subject', headerName: 'Subject',align:'center',headerAlign:'center',headerClassName: 'headercol',flex:1, },
+    //   { field: 'mark', headerName: 'Mark',align:'center',headerAlign:'center',headerClassName: 'headercol',flex:1, },
+    //   { field: 'tm', headerName: 'Total_Mark',align:'center',headerAlign:'center',headerClassName: 'headercol',flex:1, },
+    //   { field: 'cgpa', headerName: 'CGPA',align:'center',headerAlign:'center',headerClassName: 'headercol',flex:1, },
+    // ]
+
+  return(
     <Card>
         <CardHeader sx={{backgroundColor:"#ece8d9"}}
         title="MARKLIST"
@@ -285,8 +310,9 @@ function ReportCard({handleBack,selsem}){
         action={<Tooltip title="CLOSE" placement="top" arrow><IconButton onClick={handleBack}><CloseIcon/></IconButton></Tooltip>}
       ></CardHeader>
 
-      <CardContent>
-        <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
+      <CardContent sx={{width:'auto'}}>
+        <div ref={targetRef} >
+        <div className="mx-auto" style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor:"#f9f9f9" ,width:'50rem',}}>
           <div className="mx-2">
             <img src="src/assets/pngtree-university-logo-in-flat-style-png-image_6402853.png" alt="ulogo" width='100px' height='100px'></img>
           </div>
@@ -294,11 +320,11 @@ function ReportCard({handleBack,selsem}){
             <Typography variant="h4">ABC University</Typography>
           </div>
         </div>
-        <div style={{display:'flex'}}>
+        <div style={{display:'flex',width:'50rem' , margin:'0 auto', backgroundColor:"#f9f9f9"}}>
           <div style={{flex:'1'}}>
-            <img src={`src/assets/Avatar/avatar${Math.floor(Math.random() * 10)}.jpg`} alt="dp" width='200px' height='200px' style={{marginLeft:"5rem"}} ></img>
+            <img src={`src/assets/Avatar/avatar${Math.floor(Math.random() * 10)}.jpg`} alt="dp" width='150px' height='150px' style={{marginLeft:"1rem"}} ></img>
           </div>
-          <div style={{flex:'3'}}>
+          <div style={{flex:'4'}}>
             <div className="row m-2">
               <Typography fontWeight='bold' className="col-sm-3" >NAME :  </Typography>
               <Typography fontWeight='bold' className="col-sm-9" fontFamily='Verdana'>{selectedStudent.sname}</Typography>
@@ -317,70 +343,104 @@ function ReportCard({handleBack,selsem}){
             </div> 
             <div className="row m-2">
               <Typography fontWeight='bold' className="col-sm-3">SEMESTER : </Typography>
-              <Typography fontWeight='bold' className="col-sm-9" fontFamily='Verdana'> {selectedStudent.sem} </Typography>
+              <Typography fontWeight='bold' className="col-sm-9" fontFamily='Verdana'> {selsem ==5 ? selsem-1 : selsem} </Typography>
             </div> 
           </div>
         </div>
-        <div className="mt-4">
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow style={{backgroundColor:"#8f8787"}}>
-                  <TableCell style={{color:'white',textAlign:"center"}}>SEMESTER</TableCell>
-                  <TableCell style={{color:'white',textAlign:"center"}}>SUBJECT</TableCell>
-                  <TableCell style={{color:'white',textAlign:"center"}}>MARKS</TableCell>
-                  {/* <TableCell>TOTALMARKS</TableCell>
-                  <TableCell>CGPA</TableCell> */}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                <TableRow>
-                  <TableCell sx={{textAlign:'center'}}>{selsem}</TableCell>
-                  <TableCell sx={{paddingLeft:"4rem"}}>
-                    <Box>
-                      {[1,2,3,4,5,6].map(j => (
-                        <Typography sx={{marginY:"1rem" }} key={j}>{selectedStudent[`s${selsem}b${j}`]}</Typography>
-                      ))}
-                    </Box>
-                  </TableCell>
-                  <TableCell sx={{textAlign:'center'}}>
-                  <div>
-                      {[1,2,3,4,5,6].map(j => (
-                        <Typography sx={{marginY:"1rem",color:selectedStudent[`s${selsem}m${j}`] <35 ? 'red' : 'inherit' }} key={j}>{selectedStudent[`s${selsem}m${j}`]}</Typography>
-                      ))}
-                    </div>
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </div>
-      </CardContent>
+        {selsem <=4 && (
+          <div className="mt-4" style={{margin:'0 auto',width:'50rem', backgroundColor:"#f9f9f9"}}>
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow style={{backgroundColor:"#8f8787"}}>
+                    {/* <TableCell style={{color:'white',textAlign:"center"}}>SEMESTER</TableCell> */}
+                    <TableCell style={{color:'white',textAlign:"center"}}>SUBJECT</TableCell>
+                    <TableCell style={{color:'white',textAlign:"center"}}>MARKS</TableCell>
+                    {/* <TableCell>TOTALMARKS</TableCell>
+                    <TableCell>CGPA</TableCell> */}
+                  </TableRow>
+                </TableHead>
+                <TableBody sx={{backgroundColor:"#f9f9f9"}} >
+                  <TableRow>
+                    {/* <TableCell sx={{textAlign:'center',fontSize:"1rem"}}>{selsem}</TableCell> */}
+                    <TableCell sx={{paddingLeft:"4rem"}}>
+                      <Box>
+                        {[1,2,3,4,5,6].map(j => (
+                          <Typography sx={{marginY:"0.5rem" }} key={j}>{selectedStudent[`s${selsem}b${j}`]}</Typography>
+                        ))}
+                      </Box>
+                    </TableCell>
+                    <TableCell sx={{textAlign:'center'}}>
+                    <div>
+                        {[1,2,3,4,5,6].map(j => (
+                          <Typography sx={{marginY:"0.5rem",color:selectedStudent[`s${selsem}m${j}`] <35 ? 'red' : 'inherit' }} key={j}>{selectedStudent[`s${selsem}m${j}`]}</Typography>
+                        ))}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <div className="row mt-4">
+              {arc 
+                ? (<><Typography fontWeight='bold' paddingLeft='2rem' className="col-sm-1 ">Arrear</Typography><Typography  fontWeight='bold' paddingLeft='2rem' className="col-sm-8 " color='error'>{arc}</Typography></>) 
+                : (<span className="col-sm-9"></span>)}
+                
+                <Typography fontWeight='bold' className="col-sm-2 ">Total Marks</Typography><Typography  fontWeight='bold' className="col-sm-1 ">
+                {sum(
+                  selectedStudent[`s${selsem}m1`],
+                  selectedStudent[`s${selsem}m2`],
+                  selectedStudent[`s${selsem}m3`],
+                  selectedStudent[`s${selsem}m4`],
+                  selectedStudent[`s${selsem}m5`],
+                  selectedStudent[`s${selsem}m6`]
+                )}
+                </Typography>
+              <span className="col-sm-9"></span>
+                <Typography fontWeight='bold' className="col-sm-2 ">Overall CGPA</Typography><Typography  fontWeight='bold' className="col-sm-1 ">
+                {cgp(
+                  selectedStudent[`s${selsem}m1`],
+                  selectedStudent[`s${selsem}m2`],
+                  selectedStudent[`s${selsem}m3`],
+                  selectedStudent[`s${selsem}m4`],
+                  selectedStudent[`s${selsem}m5`],
+                  selectedStudent[`s${selsem}m6`]
+                )}
+                </Typography>  
+            </div>
+          </div>
+        )}
 
+        {/* <Box width='50rem' marginX='auto' sx={{ '& .headercol': {backgroundColor: 'gray',color:"white"}}}>
+          <DataGrid rows={tcon || []} columns={col1}  hideFooter hideScrollbar disableRowSelectionOnClick/>
+        </Box>   */}
 
-
-      {mararr.length>0 ? 
-        (che() 
-            ? (<CardContent>Need to Enter mark till Current Semester</CardContent>) 
-            : (<CardContent>
+        {selsem==5 && mararr.length>0 && (
                 <div className="row gap-2">
-                <Box width='auto' minWidth='70vw' marginX='auto' sx={{ '& .headercol': {backgroundColor: 'gray',color:"white"}}}><DataGrid rows={tcon || []} columns={column} getRowHeight={() => 'auto'} hideFooter hideScrollbar disableRowSelectionOnClick/></Box>  
-                <div className="row mt-4">
-                <span className="col-sm-9"></span>
+                <Box width='50rem' marginX='auto' sx={{ '& .headercol': {backgroundColor: 'gray',color:"white"}}}><DataGrid rows={tcon || []} columns={column} getRowHeight={() => 'auto'} hideFooter hideScrollbar disableRowSelectionOnClick/></Box>  
+                <div className="row mt-4" style={{width:'50rem', margin:'0 auto'}}>
+                {arc 
+                ? (<><Typography fontWeight='bold'  className="col-sm-1 ">Arrear</Typography><Typography  fontWeight='bold' className="col-sm-8 " color='error'>{arc}</Typography></>) 
+                : (<span className="col-sm-9"></span>)}
                 <Typography fontWeight='bold' className="col-sm-2 ">Total Marks</Typography><Typography  fontWeight='bold' className="col-sm-1 ">{to}</Typography>
                 <span className="col-sm-9"></span>
                 <Typography fontWeight='bold' className="col-sm-2 ">Overall CGPA</Typography><Typography  fontWeight='bold' className="col-sm-1 ">{ocg}</Typography>
-                <span className="col-sm-9"></span>
-                <Typography fontWeight='bold' className="col-sm-2 ">Arrer Count</Typography><Typography  fontWeight='bold' className="col-sm-1 ">{arc}</Typography>
                 </div>
-                <Button  >Close</Button>
                 </div>
-            </CardContent>)) 
-        : (<CardContent>NO record</CardContent>)
+        )
       }
+      </div>
+      <div className="text-center">
+        <Button variant="outlined" onClick={handlePrint}>Print this out!</Button>
+        <Button variant="outlined" onClick={() => generatePDF(targetRef, {filename: `${selectedId}.pdf`})}>Download PDF</Button>
+      </div>
+      
+                
+      </CardContent>
+      
+      
     </Card>
     )
 }
-
 
 export default Report;
