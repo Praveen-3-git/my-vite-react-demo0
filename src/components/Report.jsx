@@ -10,9 +10,9 @@ import {useReactToPrint} from "react-to-print";
 import generatePDF from 'react-to-pdf';
 
 
+
 function Report (){
   const mararr = JSON.parse(localStorage.getItem("mararr"))||[];
-  
   const [add, setAdd] = useState(true);
   const [selsem,setselsem]=useState('1')
   const [selectedSname, setSelectedSname] = useState('');
@@ -58,18 +58,10 @@ function ReportList({handleAdd,selectsem,selectedSname,selectedId,selectedStuden
     <Card style={{width:"100%"}}>
       <CardHeader sx={{backgroundColor:"#ece8d9"}}
         title="REPORTLIST"
-        action={<Tooltip title="ADD" placement='top' arrow><Fab color='primary' size='small'  id="addbtn" onClick={handleAdd} sx={{marginX:'1rem',backgroundColor:"white",color:'black',":hover": {backgroundColor: "lightyellow"}}} > <AddIcon/></Fab></Tooltip>}
+        action={<Tooltip title="ADD" placement='top' arrow><Fab color='primary' size='small'  id="addbtn" onClick={handleAdd} sx={{marginX:'1rem',backgroundColor:"white",color:'black',":hover": {backgroundColor: "lightyellow"},display:'none'}} > <AddIcon/></Fab></Tooltip>}
       />
       <CardContent>
         <div className="row">
-          <div className="col-sm-6">
-            <TextField size="small" select fullWidth id='selname' name='selname' label ="Select Student_Name"
-              onChange={changename} value={selectedSname}
-            >
-              <MenuItem value="" key='select' >SELECT STUDENT</MenuItem>
-              {mararr.map(item=> (<MenuItem value={item.sname} key={item.sname} >{item.sname}</MenuItem>))}
-            </TextField>
-          </div>
           <div className="col-sm-6">
             <TextField size="small" select fullWidth id='selid' name='selid' label ="Select Student_ID"
               onChange={changeroll} value={selectedId}
@@ -81,6 +73,14 @@ function ReportList({handleAdd,selectsem,selectedSname,selectedId,selectedStuden
               }
             </TextField>
           </div> 
+          <div className="col-sm-6">
+            <TextField size="small" select fullWidth id='selname' name='selname' label ="Select Student_Name"
+              onChange={changename} value={selectedSname}
+            >
+              <MenuItem value="" key='select' >SELECT STUDENT</MenuItem>
+              {mararr.map(item=> (<MenuItem value={item.sname} key={item.sname} >{item.sname}</MenuItem>))}
+            </TextField>
+          </div>
         </div>
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around' ,marginTop:"2rem"}}  >
           {[1,2,3,4].filter(i=> i<=selectedStudent.sem).map(item => (

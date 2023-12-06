@@ -1,4 +1,4 @@
-import { Avatar, Button, ButtonGroup, Card, CardContent, CardHeader, Container, Fab, Grid, MenuItem, TextField, Tooltip, Typography,} from "@mui/material";
+import { Avatar, Button, ButtonGroup, Card, CardContent, CardHeader, Container, Fab, Grid, IconButton, MenuItem, TextField, Tooltip, Typography,} from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useFormik } from "formik";
 import { useEffect, useState } from "react";
@@ -10,7 +10,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { DatePicker } from "@mui/x-date-pickers";
 import AddIcon from '@mui/icons-material/Add';
-
+import PhotoCameraRoundedIcon from '@mui/icons-material/PhotoCameraRounded';
 function Student() {
   const [add, setadd] = useState(true);
   const [erow, seterow] = useState();
@@ -152,7 +152,9 @@ function StudentEntry({ handleBack , erow }) {
   const [rol,setrol]=useState(erow ? upid.id : "");
   const stuarr = JSON.parse(localStorage.getItem("stuarr")) || [];
   const subarr = JSON.parse(localStorage.getItem("subarr"))||[];
-  
+  const [isHovered, setIsHovered] = useState(false);
+  const [photo,setPhoto]=useState('src/assets/Avatar/profile.png');
+  const [photodata,setPhotodata]=useState('');
   const formik = useFormik({
     initialValues: {
       sname: erow ?  upid.sname : "" ,
@@ -313,59 +315,68 @@ function StudentEntry({ handleBack , erow }) {
       });
       return menuItems;
   };
-  
+  function handleImgChange(e) {
+    console.log(e.target.files);
+    setPhoto(URL.createObjectURL(e.target.files[0]));
+    console.log(e)
+    const input = e.target;
+    const files = input.files;
+      const file = files[0];
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const imageData = e.target.result;
+        const imageObject = {
+          name: file.name,
+          type: file.type,
+          size: file.size,
+          data: imageData,
+        };
+        console.log(imageObject)
+        setPhotodata(imageObject)
+      };
+      reader.readAsDataURL(file);
+  } 
   return (
     <Card>
       <CardHeader title={"STUDENT ENTRY"} sx={{backgroundColor:"#ece8d9"}}/>
       <CardContent>
         <form className="myform" onSubmit={formik.handleSubmit}>
-          <Grid container spacing={4}>
-            <Grid item sm={5}>
-              <TextField
-                size="small"
-                fullWidth
-                id="sname"
-                name="sname"
-                label="NAME"
-                InputProps={{readOnly:ch?true:false}}
-                value={formik.values.sname}
-                onChange={(e) => { formik.handleChange(e); }}
-                onBlur={formik.handleBlur}
-                error={formik.touched.sname && Boolean(formik.errors.sname)}
-                helperText={formik.touched.sname && formik.errors.sname}
-              />
-            </Grid>
-            <Grid item sm={2} >
-              {/* <TextField
-                size="small"
-                fullWidth
-                id="age"
-                name="age"
-                label="AGE"
-                value={formik.values.age}
-                onChange={formik.handleChange}
-                error={formik.touched.age && Boolean(formik.errors.age)}
-                helperText={formik.touched.age && formik.errors.age}
-              /> */}
-              <TextField
-                select
-                size="small"
-                fullWidth
-                id="gender"
-                name="gender"
-                label="GENDER"
-                InputProps={{readOnly:ch?true:false}}
-                value={formik.values.gender}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                error={ formik.touched.gender && Boolean(formik.errors.gender)}
-                helperText={ formik.touched.gender && formik.errors.gender}
+          <Grid container>
+            <Grid item sm={3} style={{display:'flex',alignItems: 'center',justifyContent: 'space-around'}}>
+              <div style={{width:"11rem",height:'11rem'}}  
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
               >
-                <MenuItem value="Male" key="Male"> Male </MenuItem>
-                <MenuItem value="Female" key="Female"> Female </MenuItem>
-              </TextField>
+                <label htmlFor="photopic" style={{position:'relative'}}>
+                  {/* <div style={{position:'relative'}}> */}
+                    <img src={photo} alt='profile' width='170' height='170' style={{ opacity: isHovered ? 0.3 : 1, transition: 'opacity 0.3s' }}/>
+                    <span style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', fontSize: '18px', opacity: isHovered ? 1 : 0, transition: 'opacity 0.3s',}}>
+                      <IconButton><PhotoCameraRoundedIcon/></IconButton>
+                    </span>
+                  {/* </div> */}
+                </label>                
+                <input style={{display:'none'}}
+                  type="file" id="photopic" name="photopic" onChange={handleImgChange}
+                />
+              </div>
             </Grid>
-            <Grid item sm={5}>
+            <Grid item container sm={9} spacing={1}>
+              <Grid item sm={6}>
+                <TextField
+                  size="small"
+                  fullWidth
+                  id="sname"
+                  name="sname"
+                  label="NAME"
+                  InputProps={{readOnly:ch?true:false}}
+                  value={formik.values.sname}
+                  onChange={(e) => { formik.handleChange(e); }}
+                  onBlur={formik.handleBlur}
+                  error={formik.touched.sname && Boolean(formik.errors.sname)}
+                  helperText={formik.touched.sname && formik.errors.sname}
+                />
+              </Grid>
+              <Grid item sm={6}>
               <TextField
                 size="small"
                 fullWidth
@@ -380,112 +391,146 @@ function StudentEntry({ handleBack , erow }) {
                 error={formik.touched.email && Boolean(formik.errors.email)}
                 helperText={formik.touched.email && formik.errors.email}
               />
-            </Grid>
-            <Grid item sm={5}>
-              <TextField
-                select
-                size="small"
-                fullWidth
-                id="department"
-                name="department"
-                label="DEPARTMENT"
-                InputProps={{readOnly:ch?true:false}}
-                value={formik.values.department}
-                //onChange={formik.handleChange}
-                onChange={depchange}
-                onBlur={formik.handleBlur}
-                error={ formik.touched.department && Boolean(formik.errors.department)}
-                helperText={ formik.touched.department && formik.errors.department}
-              >
-                <MenuItem value=""> Select Department </MenuItem>
-                {/* {subarr.map((item) => (
-                  <MenuItem value={item.dep} key={item.dep}>
-                    {item.dep}
-                  </MenuItem>
-                ))} */}
-                  {depoptio()}
-              </TextField>
-            </Grid>
-            <Grid item sm={2}>
-              <TextField
-                select
-                size="small"
-                fullWidth
-                id="semester"
-                name="semester"
-                label="SEMESTER"
-                value={formik.values.semester}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                error={  formik.touched.semester && Boolean(formik.errors.semester)}
-                helperText={formik.touched.semester && formik.errors.semester}
-                >
-                  {ch
-                    ? [1, 2, 3, 4].filter(item => item >= upid.semester).map(item =>
-                      <MenuItem value={item} key={item}> {item} </MenuItem>)
-                    : [1, 2, 3, 4].map(item =>
-                      <MenuItem value={item} key={item}> {item} </MenuItem>)
-                  }
-              </TextField>
-            </Grid>
-            <Grid item sm={5}> 
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                {/* <DatePicker
-                  label="DOB"   
-                  disableFuture   
-                  onChange={handleDateChange}
-                  onBlur={formik.handleBlur}
-                  value={formik.values.date}
-                  slotProps={{ textField: {
-                      size: 'small', fullWidth: true, 
-                      style: {
-                        border: `1px solid ${formik.touched.date && formik.errors.date ? 'red' : '#ced4da'}`,
-                      }, 
-                      helperText: formik.touched.date && formik.errors.date ? (
-                        <span style={{ color: 'red' }}>{formik.errors.date}</span>
-                      ) : null,
-                    }
-                  }}
+              </Grid>
+              <Grid item sm={3} xs={12} >
+                {/* <TextField
+                  size="small"
+                  fullWidth
+                  id="age"
+                  name="age"
+                  label="AGE"
+                  value={formik.values.age}
+                  onChange={formik.handleChange}
+                  error={formik.touched.age && Boolean(formik.errors.age)}
+                  helperText={formik.touched.age && formik.errors.age}
                 /> */}
-                <DatePicker
-                  disableFuture
-                  label="DOB"
-                  format="DD/MM/YYYY"
-                  value={formik.values.date}
-                  readOnly={ch?true:false}
-                  //onChange={(value) => formik.setFieldValue("date", value, true)}
-                  onChange={handleDateChange}
+                <TextField
+                  select
+                  size="small"
+                  fullWidth
+                  id="gender"
+                  name="gender"
+                  label="GENDER"
+                  InputProps={{readOnly:ch?true:false}}
+                  value={formik.values.gender}
+                  onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  slotProps={{
-                    textField: {
-                      size: 'small', fullWidth: true,
-                      error: formik.touched.date && Boolean(formik.errors.date),
-                      helperText: formik.touched.date && formik.errors.date,
+                  error={ formik.touched.gender && Boolean(formik.errors.gender)}
+                  helperText={ formik.touched.gender && formik.errors.gender}
+                >
+                  <MenuItem value="Male" key="Male"> Male </MenuItem>
+                  <MenuItem value="Female" key="Female"> Female </MenuItem>
+                </TextField>
+              </Grid>
+              <Grid item sm={6} xs={12}>
+                <TextField
+                  select
+                  size="small"
+                  fullWidth
+                  id="department"
+                  name="department"
+                  label="DEPARTMENT"
+                  InputProps={{readOnly:ch?true:false}}
+                  value={formik.values.department}
+                  //onChange={formik.handleChange}
+                  onChange={depchange}
+                  onBlur={formik.handleBlur}
+                  error={ formik.touched.department && Boolean(formik.errors.department)}
+                  helperText={ formik.touched.department && formik.errors.department}
+                >
+                  <MenuItem value=""> Select Department </MenuItem>
+                  {/* {subarr.map((item) => (
+                    <MenuItem value={item.dep} key={item.dep}>
+                      {item.dep}
+                    </MenuItem>
+                  ))} */}
+                    {depoptio()}
+                </TextField>
+              </Grid>
+              <Grid item sm={3} xs={12}>
+                <TextField
+                  select
+                  size="small"
+                  fullWidth
+                  id="semester"
+                  name="semester"
+                  label="SEMESTER"
+                  value={formik.values.semester}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={  formik.touched.semester && Boolean(formik.errors.semester)}
+                  helperText={formik.touched.semester && formik.errors.semester}
+                  >
+                    {ch
+                      ? [1, 2, 3, 4].filter(item => item >= upid.semester).map(item =>
+                        <MenuItem value={item} key={item}> {item} </MenuItem>)
+                      : [1, 2, 3, 4].map(item =>
+                        <MenuItem value={item} key={item}> {item} </MenuItem>)
                     }
-                  }}
-                />
-              </LocalizationProvider>
+                </TextField>
+              </Grid>
+              <Grid item sm={3} > 
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  {/* <DatePicker
+                    label="DOB"   
+                    disableFuture   
+                    onChange={handleDateChange}
+                    onBlur={formik.handleBlur}
+                    value={formik.values.date}
+                    slotProps={{ textField: {
+                        size: 'small', fullWidth: true, 
+                        style: {
+                          border: `1px solid ${formik.touched.date && formik.errors.date ? 'red' : '#ced4da'}`,
+                        }, 
+                        helperText: formik.touched.date && formik.errors.date ? (
+                          <span style={{ color: 'red' }}>{formik.errors.date}</span>
+                        ) : null,
+                      }
+                    }}
+                  /> */}
+                  <DatePicker
+                    disableFuture
+                    label="DOB"
+                    format="DD/MM/YYYY"
+                    value={formik.values.date}
+                    readOnly={ch?true:false}
+                    //onChange={(value) => formik.setFieldValue("date", value, true)}
+                    onChange={handleDateChange}
+                    onBlur={formik.handleBlur}
+                    slotProps={{
+                      textField: {
+                        size: 'small', fullWidth: true,
+                        error: formik.touched.date && Boolean(formik.errors.date),
+                        helperText: formik.touched.date && formik.errors.date,
+                      }
+                    }}
+                  />
+                </LocalizationProvider>
+              </Grid>
+              <Grid item sm={6}>
+                  <TextField
+                    size="small"
+                    fullWidth
+                    id="id"
+                    name="id"
+                    label="ROLL_ID"
+                    InputProps={{readOnly:ch?true:false}}
+                    value={rol}
+                    onChange={handleIdChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.id && Boolean(formik.errors.id)}
+                    helperText={formik.touched.id && formik.errors.id}
+                  />
+              </Grid>
             </Grid>
-            <Grid item sm={5}>
-            <TextField
-              size="small"
-              fullWidth
-              id="id"
-              name="id"
-              label="ROLL_ID"
-              InputProps={{readOnly:ch?true:false}}
-              value={rol}
-              onChange={handleIdChange}
-              onBlur={formik.handleBlur}
-              error={formik.touched.id && Boolean(formik.errors.id)}
-              helperText={formik.touched.id && formik.errors.id}
-            />
-            </Grid>
-            <Grid item sm={12} sx={{ textAlign: "right",marginBottom:'1rem' }}>
+            <Grid item sm={12} sx={{ textAlign: "center",marginY:'1rem' }}>
               {erow ? (<Button  variant="contained"  color="info"  sx={{ marginX: "1rem" }}  type="submit"> Update </Button>) : 
               (<Button  variant="contained"  color="success"  sx={{ marginX: "1rem" }}  type="submit"> Save </Button>)}
               <Button  variant="contained"  color="error"  sx={{ marginX: "1rem" }}  id="closebtn"  onClick={handleBack}> Cancel</Button>
             </Grid>
+          </Grid>
+          <Grid>
+            <img src={photodata.data} alt='alt' width='200' height='200'  />
           </Grid>
         </form>
         
