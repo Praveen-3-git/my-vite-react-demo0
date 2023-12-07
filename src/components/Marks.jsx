@@ -79,8 +79,22 @@ function StudentMarkList({handleAdd , handleEdit}){
         action={<Tooltip title="ADD" placement='top' arrow><Fab color='primary' size='small'  id="addbtn" onClick={handleAdd} sx={{marginX:'1rem',backgroundColor:"white",color:'black',":hover": {backgroundColor: "lightyellow"}}} > <AddIcon/></Fab></Tooltip>}
       ></CardHeader>
       { mararr.length >0 
-          ? (<CardContent><Box width='auto' minWidth='70vw' sx={{ '& .headercol': {backgroundColor: 'gray',color:"white"}}} marginX='auto'><DataGrid rows={mararr} columns={col1} disableRowSelectionOnClick/></Box></CardContent>) 
-          : (<CardContent><Typography align='center'>NO RECORD FOUND</Typography></CardContent>) 
+          ? (<CardContent><Box width='auto' minWidth='70vw' sx={{ '& .headercol': {backgroundColor: 'gray',color:"white"}}} marginX='auto'>
+              <DataGrid rows={mararr} columns={col1} disableRowSelectionOnClick pageSizeOptions={[5, 10, 25]}
+                initialState={{
+                  pagination: {
+                    paginationModel: {
+                      pageSize: 5,
+                    },
+                  },
+                }}/></Box>
+            </CardContent>) 
+          : (<CardContent>
+            <div  style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+              <img src='src/assets/empty-folder.png' alt='emptyfolder'  style={{opacity:'0.5',pointerEvents:'none',width:'9rem',height:'9rem'}}></img>
+              <Typography align='center'>NO RECORD FOUND</Typography>
+            </div>
+          </CardContent>) 
        }
     </Card>
   )

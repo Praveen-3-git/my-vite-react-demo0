@@ -43,11 +43,13 @@ function Department() {
 
   function handleAdd() {
     setAdd(false);
+    handleClose()
   }
 
   function handleBack() {
     setAdd(true);
     seterow();
+    handleClose()
   }
 
   const handleEdit = (row) => {
@@ -171,7 +173,12 @@ const columns = [
               </Alert>
             </Snackbar>
         </CardContent>)
-        :(<CardContent><Typography align='center'>NO RECORD FOUND</Typography></CardContent>)}
+        :(<CardContent>
+          <div  style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            <img src='src/assets/empty-folder.png' alt='emptyfolder'  style={{opacity:'0.5',pointerEvents:'none',width:'9rem',height:'9rem'}}></img>
+            <Typography align='center'>NO RECORD FOUND</Typography>
+          </div>
+          </CardContent>)}
       
     </Card>
   );

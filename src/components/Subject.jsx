@@ -179,7 +179,14 @@ function SubjectList({handleAdd , handleEdit ,depn ,tableon,handlerEdit,tableonb
           ?(<CardContent>
             { tableon?
               ( <Box sx={{  margin:"auto",'& .headercol': {backgroundColor: 'gray',color:"white",},}}>
-                <DataGrid rows={row1} columns={column1} disableRowSelectionOnClick />
+                <DataGrid rows={row1} columns={column1} disableRowSelectionOnClick pageSizeOptions={[5, 10, 25]}
+                 initialState={{
+                  pagination: {
+                    paginationModel: {
+                      pageSize: 5,
+                    },
+                  },
+                }} />
               </Box>):
               (<Box  sx={{ '& .headercol': {backgroundColor: 'gray',color:"white"}}}>
                 <div className='row'>
@@ -190,7 +197,12 @@ function SubjectList({handleAdd , handleEdit ,depn ,tableon,handlerEdit,tableonb
               </Box>)  
             }
           </CardContent>)
-          :(<CardContent><Typography align='center'>NO RECORD FOUND</Typography></CardContent>)}
+          :(<CardContent>
+            <div  style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+              <img src='src/assets/empty-folder.png' alt='emptyfolder'  style={{opacity:'0.5',pointerEvents:'none',width:'9rem',height:'9rem'}}></img>
+              <Typography align='center'>NO RECORD FOUND</Typography>
+            </div>
+            </CardContent>)}
       </Card>
   )
 }

@@ -1,4 +1,5 @@
-import { Avatar, Button, ButtonGroup, Card, CardContent, CardHeader, Container, Fab, Grid, IconButton, MenuItem, TextField, Tooltip, Typography,} from "@mui/material";
+import * as React from 'react';
+import { Avatar, Button, ButtonGroup, Card, CardContent, CardHeader, Container, Fab, Grid, IconButton, MenuItem, Snackbar, Stack, TextField, Tooltip, Typography,} from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useFormik } from "formik";
 import { useEffect, useState } from "react";
@@ -11,6 +12,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { DatePicker } from "@mui/x-date-pickers";
 import AddIcon from '@mui/icons-material/Add';
 import PhotoCameraRoundedIcon from '@mui/icons-material/PhotoCameraRounded';
+import MuiAlert from '@mui/material/Alert';
 function Student() {
   const [add, setadd] = useState(true);
   const [erow, seterow] = useState();
@@ -42,28 +44,43 @@ function Student() {
 // eslint-disable-next-line react/prop-types
 function StudentList({ handleAdd, handleEdit }) {
   const [studata, setstudata] = useState([]);
-
+  const [loading, setLoading] = useState(true); // Introduce loading state
   const mararr = JSON.parse(localStorage.getItem("mararr"))||[]
   var ch = mararr.map((item) => item.id);
 
   useEffect(() => {
-    const stuarr = JSON.parse(localStorage.getItem("stuarr")) || [];
-    const formateddata = stuarr.map((item) => ({
-      id: item.id,
-      sname: item.sname,  
-      gender:item.gender,
-      email: item.email,
-      department: item.department,
-      semester: item.semester,
-      date:item.date,
-    }));
-    setstudata(formateddata);
+    const fetchData = async () => {
+      try {
+        const stuarr = JSON.parse(localStorage.getItem("stuarr")) || [];
+        const formateddata = stuarr.map((item) => ({
+          id: item.id,
+          sname: item.sname,
+          gender: item.gender,
+          email: item.email,
+          department: item.department,
+          semester: item.semester,
+          date: item.date,
+          pic: item.pic,
+        }));
+        setTimeout(() => {
+          setstudata(formateddata);
+          setLoading(false); // Set loading to false after fetching data
+        }, 1000); // Adjust the timeout value (in milliseconds) as needed
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setLoading(false); // Set loading to false even in case of an error
+      }
+    };
+
+    fetchData();
   }, []);
 
   const columns = [
     {field:"profile",headerName:'PROFILE',align:'center',headerAlign:'center',headerClassName: 'headercol',sortable:false, flex:0.5,renderCell:(params)=>(
       <div>
-        <Avatar  alt={params.row.sname} src={`src/assets/Avatar/avatar${Math.floor(Math.random() * 10)}.jpg`} />
+        <Avatar  alt={params.row.sname} 
+        //src={`src/assets/Avatar/avatar${Math.floor(Math.random() * 10)}.jpg`} 
+        src={params.row.pic.data} />
       </div>
     )},
     { field: "id", headerName: "STUDENT_ROLL",headerClassName: 'headercol',align:'center',headerAlign:'center',  minwidth:100 ,flex:1},
@@ -118,7 +135,49 @@ function StudentList({ handleAdd, handleEdit }) {
         title={"STUDENT LIST"}
         action={<Tooltip title="ADD" placement='top' arrow><Fab color='primary' size='small'  id="addbtn" onClick={handleAdd} sx={{marginX:'1rem',backgroundColor:"white",color:'black',":hover": {backgroundColor: "lightyellow"}}} > <AddIcon/></Fab></Tooltip>}
       />
-      {studata.length>0
+      {loading ? (
+        <CardContent>
+          {/* Show a loading indicator while data is being fetched */}
+           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            <img
+              src='src/assets/loading.gif'
+              alt='emptyfolder'
+              style={{ opacity: '0.5', pointerEvents: 'none', width: '9rem', height: '9rem' }}
+            ></img>
+            <Typography align='center'>LOADING ... </Typography>
+          </div>
+        </CardContent>
+      ) : studata.length > 0 ? (
+        <CardContent
+          sx={{ margin: "auto", '& .headercol': { backgroundColor: 'gray', color: "white" } }}
+        >
+          <DataGrid
+            rows={studata}
+            columns={columns}
+            initialState={{
+              pagination: {
+                paginationModel: {
+                  pageSize: 5,
+                },
+              },
+            }}
+            pageSizeOptions={[5, 10, 25]}
+            disableRowSelectionOnClick
+          />
+        </CardContent>
+      ) : (
+        <CardContent>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            <img
+              src='src/assets/empty-folder.png'
+              alt='emptyfolder'
+              style={{ opacity: '0.5', pointerEvents: 'none', width: '9rem', height: '9rem' }}
+            ></img>
+            <Typography align='center'>NO RECORD FOUND</Typography>
+          </div>
+        </CardContent>
+      )}
+      {/* {studata.length>0
         ?(<CardContent sx={{  margin:"auto",'& .headercol': {backgroundColor: 'gray',color:"white",},}}>
         <DataGrid
           rows={studata}
@@ -134,10 +193,18 @@ function StudentList({ handleAdd, handleEdit }) {
           disableRowSelectionOnClick
         />
       </CardContent>)
-        :(<CardContent><Typography align='center'>NO RECORD FOUND</Typography></CardContent>)}
+        :(<CardContent>
+          <div  style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            <img src='src/assets/empty-folder.png' alt='emptyfolder'  style={{opacity:'0.5',pointerEvents:'none',width:'9rem',height:'9rem'}}></img>
+            <Typography align='center'>NO RECORD FOUND</Typography>
+          </div>
+          </CardContent>)} */}
     </Card>
   );
 }
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 // eslint-disable-next-line react/prop-types
 function StudentEntry({ handleBack , erow }) {
   const mararr = JSON.parse(localStorage.getItem("mararr"))||[]
@@ -148,13 +215,18 @@ function StudentEntry({ handleBack , erow }) {
     //console.log(upid)
     var ch = mararr.some((item) => item.id==upid.id);
   }
+  var p={
+    name:'nopic',
+    data:"src/assets/Avatar/profile.png"
+  }
   const [depn,setdepn]=useState(erow ? upid.department:"");
   const [rol,setrol]=useState(erow ? upid.id : "");
   const stuarr = JSON.parse(localStorage.getItem("stuarr")) || [];
   const subarr = JSON.parse(localStorage.getItem("subarr"))||[];
   const [isHovered, setIsHovered] = useState(false);
-  const [photo,setPhoto]=useState('src/assets/Avatar/profile.png');
-  const [photodata,setPhotodata]=useState('');
+  //const [photo,setPhoto]=useState('src/assets/Avatar/profile.png');
+  const [photodata,setPhotodata]=useState(erow? upid.pic:p);
+  const [open, setOpen] =useState(false);
   const formik = useFormik({
     initialValues: {
       sname: erow ?  upid.sname : "" ,
@@ -216,12 +288,18 @@ function StudentEntry({ handleBack , erow }) {
     },
     onSubmit: (values) => {
       // Handle form submission
+      if(photodata.data=="src/assets/Avatar/profile.png"){
+        handleClick()
+        return 
+      }
       if(erow){
         updatework(values);
         console.log(stuarr)
         localStorage.setItem("stuarr",JSON.stringify(stuarr)); 
       }else{
-        stuarr.push(values);
+        let v={...values,pic:photodata}
+        console.log(v)
+        stuarr.push(v);
         console.log(stuarr)
         localStorage.setItem("stuarr",JSON.stringify(stuarr)); 
       } 
@@ -240,6 +318,7 @@ function StudentEntry({ handleBack , erow }) {
     stuarr[upid].id=values.id;
     stuarr[upid].date=values.date;
     stuarr[upid].code=values.code;
+    stuarr[upid].pic=photodata;
     // eslint-disable-next-line react/prop-types
     if(ch){
       // eslint-disable-next-line react/prop-types
@@ -252,6 +331,16 @@ function StudentEntry({ handleBack , erow }) {
   function ba(){
     document.getElementById("closebtn").click();
   }
+  const handleClick = () => {
+    setOpen(true);
+  };
+
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpen(false);
+  };
   const handleDateChange = (date) => {
     // Convert date to dayjs object
     const dayjsDate = dayjs(date).format('YYYY-MM-DD');
@@ -317,7 +406,7 @@ function StudentEntry({ handleBack , erow }) {
   };
   function handleImgChange(e) {
     console.log(e.target.files);
-    setPhoto(URL.createObjectURL(e.target.files[0]));
+    //setPhoto(URL.createObjectURL(e.target.files[0]));
     console.log(e)
     const input = e.target;
     const files = input.files;
@@ -343,20 +432,21 @@ function StudentEntry({ handleBack , erow }) {
         <form className="myform" onSubmit={formik.handleSubmit}>
           <Grid container>
             <Grid item sm={3} style={{display:'flex',alignItems: 'center',justifyContent: 'space-around'}}>
-              <div style={{width:"11rem",height:'11rem'}}  
-                onMouseEnter={() => setIsHovered(true)}
+              <div style={{width:"11rem",height:'11rem',border: open && '1px solid red' }}  
+                onMouseEnter={() => ch ?  setIsHovered(false):  setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
               >
-                <label htmlFor="photopic" style={{position:'relative'}}>
+                <label htmlFor="photopic" style={{position:'relative',pointerEvents:ch&&'none'}}>
                   {/* <div style={{position:'relative'}}> */}
-                    <img src={photo} alt='profile' width='170' height='170' style={{ opacity: isHovered ? 0.3 : 1, transition: 'opacity 0.3s' }}/>
+                    <img src={photodata.data} alt='profile' width='170' height='170' style={{ opacity: isHovered ? 0.3 : 1, transition: 'opacity 0.3s' }}/>
                     <span style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', fontSize: '18px', opacity: isHovered ? 1 : 0, transition: 'opacity 0.3s',}}>
                       <IconButton><PhotoCameraRoundedIcon/></IconButton>
                     </span>
                   {/* </div> */}
                 </label>                
                 <input style={{display:'none'}}
-                  type="file" id="photopic" name="photopic" onChange={handleImgChange}
+                  type="file" id="photopic" name="photopic" accept=".jpg, .png" onChange={handleImgChange}
+                  readOnly={ch?true:false}
                 />
               </div>
             </Grid>
@@ -469,7 +559,7 @@ function StudentEntry({ handleBack , erow }) {
                     }
                 </TextField>
               </Grid>
-              <Grid item sm={3} > 
+              <Grid item sm={5} > 
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   {/* <DatePicker
                     label="DOB"   
@@ -507,7 +597,7 @@ function StudentEntry({ handleBack , erow }) {
                   />
                 </LocalizationProvider>
               </Grid>
-              <Grid item sm={6}>
+              <Grid item sm={7}>
                   <TextField
                     size="small"
                     fullWidth
@@ -529,14 +619,19 @@ function StudentEntry({ handleBack , erow }) {
               <Button  variant="contained"  color="error"  sx={{ marginX: "1rem" }}  id="closebtn"  onClick={handleBack}> Cancel</Button>
             </Grid>
           </Grid>
-          <Grid>
-            <img src={photodata.data} alt='alt' width='200' height='200'  />
-          </Grid>
+          {/* <Grid>
+            <Avatar src={photodata.data} alt='alt' width='200' height='200'  />
+          </Grid> */}
         </form>
-        
+        <Stack spacing={2} sx={{ width: '100%' }}>
+      <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+        <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>
+          Need To Select Photo
+        </Alert>
+      </Snackbar>
+    </Stack>
       </CardContent>
     </Card>
   );
 }
-
 export default Student;
