@@ -5,6 +5,7 @@ import { useFormik } from "formik";
 import { useEffect, useState } from "react";
 import * as Yup from "yup";
 import dayjs from 'dayjs';
+import 'dayjs/locale/de';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import EditIcon from '@mui/icons-material/Edit';
@@ -48,43 +49,46 @@ function StudentList({ handleAdd, handleEdit }) {
   const mararr = JSON.parse(localStorage.getItem("mararr"))||[]
   var ch = mararr.map((item) => item.id);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const stuarr = JSON.parse(localStorage.getItem("stuarr")) || [];
-        const formateddata = stuarr.map((item) => ({
-          id: item.id,
-          sname: item.sname,
-          gender: item.gender,
-          email: item.email,
-          department: item.department,
-          semester: item.semester,
-          date: item.date,
-          pic: item.pic,
-        }));
-        setTimeout(() => {
-          setstudata(formateddata);
-          setLoading(false); // Set loading to false after fetching data
-        }, 1000); // Adjust the timeout value (in milliseconds) as needed
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        setLoading(false); // Set loading to false even in case of an error
-      }
-    };
+  const fetchData = async () => {
+    try {
+      const stuarr = JSON.parse(localStorage.getItem("stuarr")) || [];
+      const formateddata = stuarr.map((item) => ({
+        id: item.id,
+        sname: item.sname,
+        gender: item.gender,
+        email: item.email,
+        department: item.department,
+        semester: item.semester,
+        date: item.date,
+        pic: item.pic,
+      }));
+      setTimeout(() => {
+        setstudata(formateddata);
+        setLoading(false); // Set loading to false after fetching data
+      }, 1000); // Adjust the timeout value (in milliseconds) as needed
+      // await new Promise((resolve) => setTimeout(resolve, 1000));
+      // setstudata(formateddata);
+      // setLoading(false);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      setLoading(false); // Set loading to false even in case of an error
+    }
+  };
 
+  useEffect(() => {
     fetchData();
   }, []);
 
   const columns = [
-    {field:"profile",headerName:'PROFILE',align:'center',headerAlign:'center',headerClassName: 'headercol',sortable:false, flex:0.5,renderCell:(params)=>(
+    {field:"profile",headerName:'PROFILE',align:'center',headerAlign:'center',headerClassName: 'headercol',sortable:false, flex:0.5,minWidth:100,renderCell:(params)=>(
       <div>
         <Avatar  alt={params.row.sname} 
         //src={`src/assets/Avatar/avatar${Math.floor(Math.random() * 10)}.jpg`} 
         src={params.row.pic.data} />
       </div>
     )},
-    { field: "id", headerName: "STUDENT_ROLL",headerClassName: 'headercol',align:'center',headerAlign:'center',  minwidth:100 ,flex:1},
-    { field: "sname", headerName: "STUDENT_NAME",headerClassName: 'headercol',headerAlign:'center',  minwidth:100 ,flex:2 ,renderCell:(params)=>(
+    { field: "id", headerName: "STUDENT_ROLL",headerClassName: 'headercol',align:'center',headerAlign:'center',  minWidth:150 ,flex:1},
+    { field: "sname", headerName: "STUDENT_NAME",headerClassName: 'headercol',headerAlign:'center',  minWidth:200 ,flex:2 ,renderCell:(params)=>(
       <div>
         <Typography variant="subtitle1">{params.row.sname}</Typography>
         <Typography variant="body2">{params.row.department}</Typography>
@@ -94,11 +98,11 @@ function StudentList({ handleAdd, handleEdit }) {
     //{ field: "date", headerName: "DOB", minwidth:100 },
     //{ field: "email", headerName: "Email_Id" ,headerClassName: 'headercol',  minwidth:100 ,width:200},
     //{ field: "department", headerName: "DEPARTMENT" ,headerClassName: 'headercol', minwidth:100 ,width:250  },
-    { field: "semester", headerName: "SEMESTER" ,headerClassName: 'headercol', align:'center',headerAlign:'center', minwidth:100,flex:0.5 },
+    { field: "semester", headerName: "SEMESTER" ,headerClassName: 'headercol', align:'center',headerAlign:'center', minWidth:100,flex:0.5 },
     {
       field: "act",
       headerName: "ACTION",
-      minwidth:100 ,
+      minWidth:100 ,
       flex:1,
       align: "center",
       headerAlign: "center",
@@ -365,14 +369,14 @@ function StudentEntry({ handleBack , erow }) {
       let f3 = e.target.value.slice(0, 3).toUpperCase();
       if (rol && !formik.touched.id) {
         // Only update if the 'id' field has not been manually touched
-        setrol((prevRol) => f3 + prevRol.slice(3, 5));
+        setrol((prevRol) => f3 + prevRol.slice(3, 6));
       }
     }else{
       setdepn(e)
       let f3 = e.slice(0, 3).toUpperCase();
       if (rol && !formik.touched.id) {
         // Only update if the 'id' field has not been manually touched
-        setrol((prevRol) => f3 + prevRol.slice(3, 5));
+        setrol((prevRol) => f3 + prevRol.slice(3, 6));
       }
     }
   }
@@ -560,7 +564,7 @@ function StudentEntry({ handleBack , erow }) {
                 </TextField>
               </Grid>
               <Grid item sm={5} > 
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale='de'>
                   {/* <DatePicker
                     label="DOB"   
                     disableFuture   
@@ -624,7 +628,7 @@ function StudentEntry({ handleBack , erow }) {
           </Grid> */}
         </form>
         <Stack spacing={2} sx={{ width: '100%' }}>
-      <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+      <Snackbar open={open} autoHideDuration={1000} onClose={handleClose}>
         <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>
           Need To Select Photo
         </Alert>

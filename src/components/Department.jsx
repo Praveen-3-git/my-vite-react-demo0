@@ -145,14 +145,14 @@ const columns = [
 ];
 
   return (
-    <Card style={{ width: "100%" }}>
+    <Card style={{ width:"100%"}}>
       <CardHeader sx={{backgroundColor:"#ece8d9"}}
         title={"DEPARTMENT LIST"}
         action={<Tooltip title="ADD" placement='top' arrow><Fab color='primary' size='small'  id="addbtn" onClick={handleAdd} sx={{marginX:'1rem',backgroundColor:"white",color:'black',":hover": {backgroundColor: "lightyellow"}}} > <AddIcon/></Fab></Tooltip>}
       ></CardHeader>
       {departmentData.length>0
         ?(<CardContent>
-          <Box sx={{ '& .headercol': {backgroundColor: 'gray',color:"white"}}}>
+          <Box sx={{'& .headercol': {backgroundColor: 'gray',color:"white"}}}>
             <DataGrid 
               rows={departmentData}
               columns={columns}
