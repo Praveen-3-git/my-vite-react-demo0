@@ -374,7 +374,7 @@ function MarkEntry({handleBack,erow,pse}){
         <Card>
             <CardHeader title={'MARK ENTRY'} sx={{backgroundColor:"#ece8d9"}}/> 
             <CardContent>
-                <form id="myform" onSubmit={saveon}>
+              <form id="myform" onSubmit={saveon}>
                 <div className="row">
                     <div className="col-sm-4 py-3">
                         {/* <TextField
@@ -401,7 +401,7 @@ function MarkEntry({handleBack,erow,pse}){
                           value={selectedSname}
                           renderInput={(params) => (
                             <TextField
-                              label="SELECT STUDENT"
+                              label="SELECT STUDENT" required
                               {...params}
                             />
                           )}
@@ -409,7 +409,7 @@ function MarkEntry({handleBack,erow,pse}){
                     </div>
                     <div className="col-sm-3 py-3">
                         <TextField
-                            select
+                            select required
                             fullWidth size="small"
                             id="sroll"
                             name='sroll'
@@ -430,7 +430,7 @@ function MarkEntry({handleBack,erow,pse}){
                     </div>
                     <div className="col-sm-3 py-3">
                         <TextField
-                            select
+                            select required
                             fullWidth size="small"
                             id="sco"
                             name='sco'
@@ -446,7 +446,7 @@ function MarkEntry({handleBack,erow,pse}){
                     </div>
                     <div className="col-sm-2 py-3">
                         <TextField
-                            select
+                            select required
                             fullWidth size="small"
                             id="ssem"
                             name='ssem'

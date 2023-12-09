@@ -2,7 +2,7 @@
 /* eslint-disable no-undef */
 import { Box, Button, Card, CardContent, CardHeader, Container, Fab, IconButton, MenuItem, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import { useState, useEffect, Fragment, useRef} from "react";
+import { useState, useEffect, useRef} from "react";
 import CloseIcon from '@mui/icons-material/Close';
 import AddIcon from '@mui/icons-material/Add';
 import DescriptionIcon from '@mui/icons-material/Description';
@@ -10,6 +10,7 @@ import {useReactToPrint} from "react-to-print";
 import generatePDF from 'react-to-pdf';
 import PrintIcon from '@mui/icons-material/Print';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import dayjs from "dayjs";
 
 function Report (){
   const mararr = JSON.parse(localStorage.getItem("mararr"))||[];
@@ -66,18 +67,19 @@ function ReportList({handleAdd,selectsem,selectedSname,selectedId,selectedStuden
             <TextField size="small" select fullWidth id='selid' name='selid' label ="Select Student_ID"
               onChange={changeroll} value={selectedId}
             >
-            <MenuItem value="" key='select' >SELECT ID</MenuItem>
-              {selectedSname 
+            <MenuItem value="" key='select' disabled >SELECT ID</MenuItem>
+              {/* {selectedSname 
                 ? (mararr.filter(item=> item.sname===selectedSname).map(itemm=> (<MenuItem value={itemm.id} key={itemm.id}>{itemm.id}</MenuItem>)))
                 : (mararr.map(item=> (<MenuItem value={item.id} key={item.id} >{item.id}</MenuItem>)))  
-              }
+              } */}
+              {mararr.map(item=> (<MenuItem value={item.id} key={item.id} >{item.id}</MenuItem>))}
             </TextField>
           </div> 
           <div className="col-sm-6">
             <TextField size="small" select fullWidth id='selname' name='selname' label ="Select Student_Name"
-              onChange={changename} value={selectedSname}
+              onChange={changename} value={selectedSname} InputProps={{readOnly: true}} sx={{pointerEvents:'none'}}
             >
-              <MenuItem value="" key='select' >SELECT STUDENT</MenuItem>
+              <MenuItem value="" key='select'disabled >SELECT STUDENT</MenuItem>
               {mararr.map(item=> (<MenuItem value={item.sname} key={item.sname} >{item.sname}</MenuItem>))}
             </TextField>
           </div>
@@ -86,7 +88,7 @@ function ReportList({handleAdd,selectsem,selectedSname,selectedId,selectedStuden
           {[1,2,3,4].filter(i=> i<=selectedStudent.sem).map(item => (
             <div className="col-sm-3" key={item} id={item} name={item} onClick={() => selectsem(item)} style={{ width: '180px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-around' }}>
               <Button>
-              <img src="src/assets/reportpic.png" alt={`rep${item}`} width="200" height="200" ></img>              
+              <img src="src/assets/reportpic.png" alt={`rep${item}`} style={{width:"10em", height:"10em"}}></img>              
               </Button>
               <div style={{textAlign:'center',pointerEvents:'none'}}>{`SEMESTER ${item}`}</div> 
             </div>
@@ -127,42 +129,42 @@ function ReportCard({handleBack,selsem,selectedId}){
         if(mararr.length>0)
             settcon(load(ss))
     },[])
-    const column = [
-        { field: 'sem', headerName: 'Semester',align:'center',headerAlign:'center',headerClassName: 'headercol',flex:1, },
-        { 
-          field: 'subject',  
-          headerName: 'Subject',
-          headerAlign:'center' ,
-          minWidth:200,headerClassName: 'headercol',flex:2,
-          renderCell: (params) => (
-            <>
-              {params.value.map((subject, index) => (
-                <Fragment key={index}>    
-                  {subject}
-                  {index < params.value.length - 1 && <br />}
-                </Fragment>
-              ))}
-            </> 
-          )
-        },
-        { 
-          field: 'mark',  
-          headerName: 'Marks',
-          headerAlign:'center' ,
-          align:'center',headerClassName: 'headercol',flex:1,
-          renderCell: (params) => (
-            <div>
-              {params.value.map((subject,index)=>(
-                <div key={index} style={{color:subject <35 ? 'red' : 'inherit' }}>
-                  {subject}
-                </div>
-              ))}
-            </div>
-          )
-        },
-        // { field: 'tm', headerName: 'Total Marks',align:'center',headerAlign:'center' ,headerClassName: 'headercol',flex:1,},
-        { field: 'cgpa', headerName: 'GPA',align:'center',headerAlign:'center' ,headerClassName: 'headercol',flex:1,},
-      ];
+    // const column = [
+    //     { field: 'sem', headerName: 'Semester',align:'center',headerAlign:'center',headerClassName: 'headercol',flex:1, },
+    //     { 
+    //       field: 'subject',  
+    //       headerName: 'Subject',
+    //       headerAlign:'center' ,
+    //       minWidth:200,headerClassName: 'headercol',flex:2,
+    //       renderCell: (params) => (
+    //         <>
+    //           {params.value.map((subject, index) => (
+    //             <Fragment key={index}>    
+    //               {subject}
+    //               {index < params.value.length - 1 && <br />}
+    //             </Fragment>
+    //           ))}
+    //         </> 
+    //       )
+    //     },
+    //     { 
+    //       field: 'mark',  
+    //       headerName: 'Marks',
+    //       headerAlign:'center' ,
+    //       align:'center',headerClassName: 'headercol',flex:1,
+    //       renderCell: (params) => (
+    //         <div>
+    //           {params.value.map((subject,index)=>(
+    //             <div key={index} style={{color:subject <35 ? 'red' : 'inherit' }}>
+    //               {subject}
+    //             </div>
+    //           ))}
+    //         </div>
+    //       )
+    //     },
+    //     // { field: 'tm', headerName: 'Total Marks',align:'center',headerAlign:'center' ,headerClassName: 'headercol',flex:1,},
+    //     { field: 'cgpa', headerName: 'GPA',align:'center',headerAlign:'center' ,headerClassName: 'headercol',flex:1,},
+    //   ];
       console.log(sdat)
       console.log(sdat.date)
       function load(item){
@@ -282,7 +284,10 @@ function ReportCard({handleBack,selsem,selectedId}){
       fileName: 'your-desired-filename.pdf'
     });
     function ches(){
-      if(selsem<=4 && selectedStudent[`s${selsem}m1`]=="")
+      let sm=`s${selsem}m1` in selectedStudent
+      if (!sm)
+        return true
+      else if(selsem<=4 && selectedStudent[`s${selsem}m1`]=="")
         return true
       else 
         return false
@@ -302,14 +307,29 @@ function ReportCard({handleBack,selsem,selectedId}){
         }
       return false; // No empty values found
     }
-    // const col1=[
-    //   { field: 'sem', headerName: 'Semester',align:'center',headerAlign:'center',headerClassName: 'headercol',flex:1, },
-    //   { field: 'subject', headerName: 'Subject',align:'center',headerAlign:'center',headerClassName: 'headercol',flex:1, },
-    //   { field: 'mark', headerName: 'Mark',align:'center',headerAlign:'center',headerClassName: 'headercol',flex:1, },
-    //   { field: 'tm', headerName: 'Total_Mark',align:'center',headerAlign:'center',headerClassName: 'headercol',flex:1, },
-    //   { field: 'cgpa', headerName: 'CGPA',align:'center',headerAlign:'center',headerClassName: 'headercol',flex:1, },
-    // ]
-
+    const col1=[
+      { field: 'sem', headerName: 'Semester',align:'center',headerAlign:'center',headerClassName: 'headercol',flex:1,renderCell:(params)=>(<Typography>{params.row.sem}</Typography>) },
+      { field: 'subject', headerName: 'Subject',headerAlign:'center',headerClassName: 'headercol',flex:2.5, 
+        renderCell:(params)=>(
+          <div>
+            {[1,2,3,4,5,6].map(j=> (
+              <Typography key={j}>{params.row.subject[j-1]}</Typography>
+            ) )}
+          </div>
+        )  
+      },
+      { field: 'mark', headerName: 'Mark',align:'center',headerAlign:'center',headerClassName: 'headercol',flex:1,
+        renderCell:(params)=>(
+          <div>
+            {[1,2,3,4,5,6].map(j=> (
+              <Typography style={{color:params.row.mark[j-1]<35? 'red':'inherit'}} key={j}>{params.row.mark[j-1]}</Typography>
+            ) )}
+          </div>
+        ) 
+      },
+      // { field: 'tm', headerName: 'Total_Mark',align:'center',headerAlign:'center',headerClassName: 'headercol',flex:1, },
+      { field: 'cgpa', headerName: 'CGPA',align:'center',headerAlign:'center',headerClassName: 'headercol',flex:1,renderCell:(params)=>(<Typography>{params.row.cgpa}</Typography>)},
+    ]
   return(
     <Card>
         <CardHeader sx={{backgroundColor:"#ece8d9"}}
@@ -324,7 +344,7 @@ function ReportCard({handleBack,selsem,selectedId}){
               {/* <Typography className="m-3" align='center'>NO RECORD FOUND</Typography> */}
             </div>
        </CardContent>): (
-        <CardContent sx={{width:'auto'}}>
+        <CardContent sx={{width: 'auto' }}>
             <div ref={targetRef} >
             <div className="mx-auto" style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor:"#f9f9f9" ,width:'50rem',}}>
               <div className="mx-2">
@@ -350,7 +370,7 @@ function ReportCard({handleBack,selsem,selectedId}){
                 </div>
                 <div className="row m-2">
                   <Typography fontWeight='bold' className="col-sm-3">D.O.B :  </Typography>
-                  <Typography fontWeight='bold' className="col-sm-9" fontFamily='Verdana'>{(sdat.date).substring(0,10)}</Typography>
+                  <Typography fontWeight='bold' className="col-sm-9" fontFamily='Verdana'>{/*(sdat.date).substring(0,10)*/}{dayjs(sdat.date).format('YYYY-MM-DD')}</Typography>
                 </div>
                 <div className="row m-2">
                   <Typography fontWeight='bold' className="col-sm-3">DEPARTMENT : </Typography>
@@ -434,15 +454,14 @@ function ReportCard({handleBack,selsem,selectedId}){
               </div>
             )}
 
-            {/* <Box width='50rem' marginX='auto' sx={{ '& .headercol': {backgroundColor: 'gray',color:"white"}}}>
-              <DataGrid rows={tcon || []} columns={col1}  hideFooter hideScrollbar disableRowSelectionOnClick/>
-            </Box>   */}
-
             {selsem==5 && mararr.length>0 && (
                     <div className="row gap-2">
-                    <Box width='50rem' marginX='auto' sx={{ '& .headercol': {backgroundColor: 'gray',color:"white"}}}><DataGrid rows={tcon || []} columns={column} getRowHeight={() => 'auto'} hideFooter hideScrollbar disableRowSelectionOnClick/></Box>
-                    <div style={{width:'50rem', margin:'1rem   auto',display:'flex',alignContent:'center',justifyContent:"space-between"}}>
-                    {arc 
+                    <Box width='50rem' marginX='auto' sx={{ '& .headercol': {backgroundColor: 'gray',color:"white"}}}>
+                      {/* <DataGrid rows={tcon || []} columns={column} getRowHeight={() => 'auto'} hideFooter hideScrollbar disableRowSelectionOnClick/> */}
+                      <DataGrid rows={tcon || []} columns={col1} getRowHeight={() => 'auto'} hideFooter hideScrollbar disableRowSelectionOnClick/>
+                    </Box>
+                    <div style={{width:'50rem', margin:'1rem   auto',display:'flex',alignContent:'center',justifyContent:arc !==0 ? 'space-between' : 'end' }}>
+                    {arc !=0
                     && (<><Typography fontWeight='bold'  >Arrear<span style={{margin:'1rem',color:'red'}} fontWeight='bold'>{arc}</span></Typography></>) 
                     }
                     {/* <Typography fontWeight='bold'>Total Marks<span  fontWeight='bold' style={{margin:'0 1rem'}}>{to}</span></Typography> */}

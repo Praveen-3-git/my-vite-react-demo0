@@ -43,7 +43,7 @@ function Subject(){
   }
 //
     return (
-    <Container className='my-5'>
+    <Container className='my-5' >
       {add ? 
       <SubjectList handleAdd={handleAdd} handleEdit={handleEdit} depn={depn} tableon={tableon} handlerEdit={handlerEdit} tableonback={tableonback}/> :
       <SubjectEntry handleBack={handleBack} erow={erow} depn={depn}/>}
@@ -59,7 +59,7 @@ function SubjectList({handleAdd , handleEdit ,depn ,tableon,handlerEdit,tableonb
   const subarr = JSON.parse(localStorage.getItem("subarr"))||[]
   const column1=[
     {field :'id', headerName:'S.NO',flex:0.2 ,headerClassName: 'headercol',minWidth:100},
-    {field :'name', headerName:'DEPARTMENT', flex:1, headerAlign: 'center',headerClassName: 'headercol',minWidth:100,renderCell: (params) => (
+    {field :'name', headerName:'DEPARTMENT', flex:1, headerAlign: 'center',headerClassName: 'headercol',minWidth:300,renderCell: (params) => (
             <Tooltip title="Show data" placement="left" arrow> 
               <Button
                 fullWidth
@@ -94,7 +94,7 @@ function SubjectList({handleAdd , handleEdit ,depn ,tableon,handlerEdit,tableonb
   var row1=data.filter((item) => subarr.some((itemm) => itemm.dep === item.name))
 
   const column = [
-    { field: 'sem', headerName: 'Semester',align:'center',headerAlign:'center' , headerClassName: 'headercol',flex:1,minWidth:100},
+    { field: 'sem', headerName: 'Semester',align:'center',headerAlign:'center' , headerClassName: 'headercol',flex:1,minWidth:80},
     { 
       field: 'subject',  
       headerName: 'Subject', 
@@ -102,11 +102,11 @@ function SubjectList({handleAdd , handleEdit ,depn ,tableon,handlerEdit,tableonb
       headerAlign:'center' ,
       flex:2,
       sortable: false ,
-      minWidth:150,
+      minWidth:250,
       renderCell: (params) => (
         <div>
           {params.value.map((subject, index) => (
-            <div key={index} style={{ color: subject === 'Pending' ? 'red' : 'inherit' }}>
+            <div className="my-1" key={index} style={{ color: subject === 'Pending' ? 'red' : 'inherit' }}>
               {subject}
             </div>
           ))}
@@ -169,7 +169,7 @@ function SubjectList({handleAdd , handleEdit ,depn ,tableon,handlerEdit,tableonb
   // }
 
   return(
-        <Card style={{width: "100%" }}>
+        <Card sx={{width:"100%"}}>
         <CardHeader sx={{backgroundColor:"#ece8d9"}}
         title={'SUBJECT LIST'}
         action={<><Fab color='primary' size='small'  id="addbtn" onClick={handleAdd} sx={{marginX:'1rem',backgroundColor:"white",color:'black',":hover": {backgroundColor: "lightyellow"}}}  > <AddIcon/></Fab>
@@ -178,7 +178,7 @@ function SubjectList({handleAdd , handleEdit ,depn ,tableon,handlerEdit,tableonb
         {subarr.length>0
           ?(<CardContent>
             { tableon?
-              ( <Box sx={{  margin:"auto",'& .headercol': {backgroundColor: 'gray',color:"white",},}}>
+              ( <Box sx={{'& .headercol': {backgroundColor: 'gray',color:"white"}}}>
                 <DataGrid rows={row1} columns={column1} disableRowSelectionOnClick pageSizeOptions={[5, 10, 25]}
                  initialState={{
                   pagination: {
@@ -280,7 +280,6 @@ function SubjectEntry( {handleBack ,erow ,depn}){
     }
   }, [])
   
-
   function semren(i){
     var semele=[];
     semele.push([1, 2, 3, 4, 5, 6].map(j => (
@@ -312,12 +311,12 @@ function SubjectEntry( {handleBack ,erow ,depn}){
   function dup( i) {
     //let kk = e.target.value;
     for(let j=1;j<=6;j++){
-      let kk= document.getElementById(`s${i}b${j}`).value
+      let kk= document.getElementById(`s${i}b${j}`).value.toLowerCase()
       if (kk !== "") {
         for (let j1 = 1; j1 <= j; j1++) {
           if (j1 !== j) {
             // Check for duplicate in other text fields
-            let otherValue = document.getElementById(`s${i}b${j1}`).value;
+            let otherValue = document.getElementById(`s${i}b${j1}`).value.toLowerCase();
             if (kk === otherValue) {
               seterr(`s${i}b${j}`)
               //alert(`Duplicate value found in s${i}b${j}`);
@@ -473,7 +472,7 @@ function SubjectEntry( {handleBack ,erow ,depn}){
         <CloseIcon/>
       </IconButton>}
         />
-        <CardContent>
+        <CardContent sx={{width:'80vw'}}>
           <div className='my-2'>
             <TextField fullWidth select id="seldep" name="seldep" value={sdep} sx={{ backgroundColor: "white" }} size='small' label="SELECT DEPARTMENT"
               InputProps={{readOnly: erow?true:false}} required
@@ -500,7 +499,7 @@ function SubjectEntry( {handleBack ,erow ,depn}){
           <Box sx={{ width: '100%', typography: 'body1' }}>
             <TabContext value={tvalue}>
               <Box sx={{ borderBottom: 1, borderColor: 'divider' ,borderRadius:"0.5rem"}}>
-                <TabList onChange={handletChange} aria-label="lab API tabs example">
+                <TabList onChange={handletChange} aria-label="lab API tabs example" >
                   <Tab label="SEMESTER One" value="1" sx={{pointerEvents: 'none'}} />
                   <Tab label="SEMESTER Two" value="2" sx={{pointerEvents: 'none'}}/>
                   <Tab label="SEMESTER Three" value="3" sx={{pointerEvents: 'none'}}/>
